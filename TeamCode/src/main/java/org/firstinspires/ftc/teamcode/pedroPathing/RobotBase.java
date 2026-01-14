@@ -7,16 +7,13 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import java.util.function.Supplier;
-
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -42,7 +39,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 @Configurable
 @TeleOp
 public abstract class RobotBase extends OpMode {
-    public Follower follower;
+    public static Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
@@ -51,20 +48,12 @@ public abstract class RobotBase extends OpMode {
     private double slowModeMultiplier = 0.5;
 
     //-----------------------------------------
-    public ColorSensor CS;
-    public final Pose startPose = new Pose(0, 0, 0);
-    //    protected Limelight3A limelight; // Limelight 相機，用於目標追蹤
-    protected DcMotorEx SlideFront, SlideBack, ArmUp, ArmDown; //定義直流馬達
-    protected CRServo Left, Right; // 手腕控制伺服馬達 (左/右)
-    protected Servo Claw, Lwrist, Rwrist; // 爪子控制伺服馬達
+//    public final Pose startPose = new Pose(0, 0, 0);
 //    private PIDController ArmPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
 //    private PIDController SlidePID = new PIDController(0, 0, 0); // 升降滑軌 PID 控制器
 
-    public Limelight3A limelight3A;
-
     //
-    protected ColorSpinner colorSpinner;  // 這樣 Tele/Auto 都可以使用;\
-    protected Elevator elevator;  // 這樣 Tele/Auto 都可以使用
+    protected ColorSpinner colorSpinner;  // 這樣 Tele/Auto 都可以使用;
     protected Shooter shooter;  // 這樣 Tele/Auto 都可以使用
     protected Intake intake;  // 這樣 Tele/Auto 都可以使用
 
@@ -79,21 +68,14 @@ public abstract class RobotBase extends OpMode {
         follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
         follower.update();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-
 //        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
 //                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
 //                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
 //                .build();
-
-
 //        limelight = new LimelightSystem(hardwareMap,telemetry);
-
-        limelight3A = hardwareMap.get(Limelight3A.class, "limelight");
-
 
         //setting
         colorSpinner = new ColorSpinner(hardwareMap, telemetry);
-        elevator = new Elevator(hardwareMap, telemetry);
         intake = new Intake(hardwareMap, telemetry);
         shooter = new Shooter(hardwareMap, telemetry);
 
@@ -111,6 +93,7 @@ public abstract class RobotBase extends OpMode {
     }
 
     public void start() {
+        shooter.limelight.start();
         robotStart();
     }
 
@@ -120,7 +103,7 @@ public abstract class RobotBase extends OpMode {
 
     public void stop() {
         robotStop();
-        //limelight.stop(); // 停止 Limelight
+        shooter.limelight.stop(); // 停止 Limelight
     }
 
     //
@@ -149,8 +132,6 @@ public abstract class RobotBase extends OpMode {
 //        ArmDown.setPower(armOutput);
     }
 
-
-
     // 滑軌移動到指定位置
     public void slideToPosition(double slidePos) {
 //        slidePosNow = (SlideBack.getCurrentPosition() / slide2length) * 2 + smin + slideOffset; // 計算當前位置
@@ -161,51 +142,4 @@ public abstract class RobotBase extends OpMode {
 //        SlideBack.setPower(slidePower);
     }
 
-
-
-
-
-
-
-
-
-    // 計算角度誤差
-//    private double calculateAngleError(double target, double current) {
-//        double error = target - current;
-//        if (error > 180) error -= 360; // 誤差大於 180 時，取反方向
-//        if (error < -180) error += 360; // 誤差小於 -180 時，取反方向
-//        return error;
-//    }
-    // 將 Limelight 輸出轉換為 Pose2d
-//    public void convertToPose2d(String telemetryOutput) {
-//        limelight.stop();
-//        String positionData = telemetryOutput.split("position=\\(")[1].split("\\)")[0];
-//        String orientationData = telemetryOutput.split("yaw=")[1].split(",")[0];
-//        String[] positionParts = positionData.split(" ");
-//        double xMeters = Double.parseDouble(positionParts[0]);
-//        double yMeters = Double.parseDouble(positionParts[1]);
-//        double yawDegrees = Double.parseDouble(orientationData);
-//        x_target = xMeters * 39.3701;
-//        y_target = yMeters * 39.3701;
-//        heading_target = yawDegrees;
-//    }
-
-    public double Rpercent() {
-        return (double) CS.red() / (CS.red() + CS.green() + CS.blue());
-    }
-
-    public double Gpercent() {
-        return (double) CS.green() / (CS.red() + CS.green() + CS.blue());
-    }
-
-    public double Bpercent() {
-        return (double) CS.blue() / (CS.red() + CS.green() + CS.blue());
-    }
-
-    public int color_detect() {
-        if (Rpercent() < 0.45 && Bpercent() < 0.2) return 2; //yellow
-        else if (Rpercent() > 0.35) return 1; //red
-        else if (Bpercent() > 0.42) return 3; //blue
-        else return 0;
-    }
 }

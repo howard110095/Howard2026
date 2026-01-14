@@ -17,8 +17,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(11)  //kg
-            .forwardZeroPowerAcceleration(-25.65) //-a
-            .lateralZeroPowerAcceleration(-29.44) //-a
+            .forwardZeroPowerAcceleration(-32.3) //-a
+            .lateralZeroPowerAcceleration(-57.9) //-a
             .useSecondaryTranslationalPIDF(false)
             .useSecondaryHeadingPIDF(false)
             .useSecondaryDrivePIDF(false)
@@ -38,21 +38,21 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .xVelocity(72.46)   //forward max power
-            .yVelocity(62.9)   // <-  max power
+            .xVelocity(71.09)   //forward max power
+            .yVelocity(50.75)   // <-  max power
             .useBrakeModeInTeleOp(false);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-12 / 2.54)
-            .strafePodX(0)
+            .forwardPodY(-12.75 / 2.54)    //12.75
+            .strafePodX(-12.3 / 2.54)      //12.3
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .yawScalar(1.0)
             .encoderResolution(
                     GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD
             )
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
+            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
     public static PathConstraints pathConstraints = new PathConstraints(
             0.995,
             50,
