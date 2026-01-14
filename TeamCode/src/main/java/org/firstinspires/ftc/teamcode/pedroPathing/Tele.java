@@ -35,9 +35,6 @@ public class Tele extends RobotBase {
 //        else if (gamepad1.dpad_right) test1 = 200;//2
 //        colorSpinner.spinToPosition(test1);
 
-        shooter.onShoot();
-        colorSpinner.on(0.18);
-        intake.on();
 
 //        intake.on();
 //        shooter.clean();
