@@ -56,6 +56,18 @@ public class Shooter {
     }
 
     public void noVisionTracking(int pipe) {
+        double targetX = 0, targetY = 0;
+        if (pipe == 0) {  //red
+            targetX = 66;
+            targetY = 66;
+        } else if (pipe == 1) {  //middle
+            targetX = 0;
+            targetY = 30;
+        } else if (pipe == 2) {  //blue
+            targetX = -66;
+            targetY = 66;
+        }
+        double slope = (follower.getPose().getY() - targetY) / (follower.getPose().getX() - targetX);
         double heading = Math.toDegrees(follower.getPose().getHeading());
         if (heading < 0) heading += 360.0;
         if (pipe == 0) { //red
@@ -84,10 +96,10 @@ public class Shooter {
                 shooterSpinner1.setPower(-result.getTx() / 10000.0 * 100.0);
                 shooterSpinner2.setPower(-result.getTx() / 10000.0 * 100.0);
             } else {
-                shooterSpinner1.setPower(-result.getTx() / 5000.0 *100.0);
-                shooterSpinner2.setPower(-result.getTx() / 5000.0 *100.0);
+                shooterSpinner1.setPower(-result.getTx() / 5000.0 * 100.0);
+                shooterSpinner2.setPower(-result.getTx() / 5000.0 * 100.0);
             }
-        }else {
+        } else {
             noVisionTracking(pipe);
         }
 
@@ -114,7 +126,7 @@ public class Shooter {
             shooterD_power = ShooterDPID.calculate(dVelocity, shooterVelocity); // 計算輸出
             shooterU_power = 1;
             shooterD_power = 1;
-                elevatorUp();
+            elevatorUp();
             //--
 //            if (uVelocity > shooterVelocity - 300 &&
 //                    dVelocity > shooterVelocity - 300 &&
@@ -135,10 +147,10 @@ public class Shooter {
         shooterD.setPower(1);
     }
 
-    public void slowMode() {
-        shooterU.setPower(0.7);
-        shooterD.setPower(0.7);
-    }
+//    public void slowMode() {
+//        shooterU.setPower(0.7);
+//        shooterD.setPower(0.7);
+//    }
 
     public void shooterOff() {
         shooterU.setPower(0);
@@ -160,8 +172,8 @@ public class Shooter {
     }
 
     public double getDegree() {
-        double reset = 250.0;
-        if (getPose() < 50) return (getPose() - reset + 350) * 90.0 / 88.0;
+        double reset = 325;
+        if (getPose() < 100) return (getPose() - reset + 350) * 90.0 / 88.0;
         else return (getPose() - reset) * 90.0 / 88.0;
     }
 

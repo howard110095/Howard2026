@@ -71,11 +71,11 @@ public class Auto1 extends RobotBase {
                 shooter.shooting(2, true);
                 setPathState(2);
             }
-        }else if (pathState == 2) {
+        } else if (pathState == 2) {
             if (!follower.isBusy()) {
                 setPathState(3);
             }
-        }else if (pathState == 3) {
+        } else if (pathState == 3) {
             if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(11);
         }
         //to 1 roll
@@ -149,8 +149,7 @@ public class Auto1 extends RobotBase {
         follower.update();
         autonomousPathUpdate();
         //vision
-        if (pathState == 12 && follower.getPose().getX() < -30) shooter.visionTracking(1);
-        else shooter.visionTracking(2);
+        shooter.visionTracking(2);
         // These loop the movements of the robot
 
         telemetry.addData("uVelocity", shooter.limelight.getLatestResult().getTx());

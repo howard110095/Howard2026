@@ -47,14 +47,7 @@ public class Tele extends RobotBase {
 //        } else colorSpinner.spin.setPower(0);
 
 
-        if (gamepad1.dpad_up) test1 += 0.01;
-        if (gamepad1.dpad_down) test1 -= 0.01;
 
-        shooter.elevator.setPower(1);
-        shooter.arm.setPosition(test1);
-        shooter.shooting(2, false);
-        intake.on();
-        colorSpinner.on(0.4);
 //Z
 //        shooter.shooting(2,true);
 
@@ -120,7 +113,7 @@ public class Tele extends RobotBase {
         telemetry.addData("1", colorSpinner.place1);
         telemetry.addData("2", colorSpinner.place2);
         telemetry.addData("3", colorSpinner.place3);
-//        telemetry.addData("delta", colorSpinner.delta);
+        telemetry.addData("shooter.getPose()", shooter.getPose());
         telemetry.addData("uVelocity", shooter.shooterU.getVelocity() / 28.0 * 60.0);
         telemetry.addData("dVelocity", shooter.shooterD.getVelocity() / 28.0 * 60.0);
         telemetry.addData("shooterU.getVelocity()", shooter.shooterU.getVelocity());
@@ -145,12 +138,10 @@ public class Tele extends RobotBase {
         if (temp1B % 4 == 0) { //take ball
             intake.off();
             colorSpinner.on(0);
-            shooter.slowMode();
         }
         if (temp1B % 4 == 1) { //take ball
             intake.on();
             colorSpinner.on(0.18);
-            shooter.slowMode();
         } else if (temp1B % 4 == 2) { // ready shooting
             intake.off();
             colorSpinner.on(0.18);
