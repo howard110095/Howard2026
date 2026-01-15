@@ -14,8 +14,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 
 @Configurable
-@Autonomous(name = "Auto", group = "Examples")
-public class Auto extends RobotBase {
+@Autonomous(name = "Auto2", group = "Examples")
+public class Auto2 extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Path park;

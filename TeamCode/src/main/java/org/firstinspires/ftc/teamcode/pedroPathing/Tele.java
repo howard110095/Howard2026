@@ -10,13 +10,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @Configurable
 @TeleOp(name = "Tele", group = "Linear OpMode")
 public class Tele extends RobotBase {
-    public double test1 = 0;
-    public boolean was1B = false;
+    public double test1 = 0.4;
+    public boolean was1B = false, stop = false;
     public int temp1B = 0;
 
     @Override
     public void robotInit() {
-        colorSpinner.colorRenew();
+
     }
 
     @Override
@@ -30,10 +30,42 @@ public class Tele extends RobotBase {
 
     @Override
     public void robotLoop() {
-//        if (gamepad1.dpad_up) test1 = 80;  //3
-//        else if (gamepad1.dpad_down) test1 = 320;//1
-//        else if (gamepad1.dpad_right) test1 = 200;//2
-//        colorSpinner.spinToPosition(test1);
+//        if (!stop) {
+//            if (colorSpinner.detectColor(1) != 0 || colorSpinner.place1 != 0) {
+//                if (colorSpinner.place1 == 0) colorSpinner.place1 = colorSpinner.detectColor(1);
+//                if (colorSpinner.detectColor(2) != 0 || colorSpinner.place2 != 0) {
+//                    if (colorSpinner.place2 == 0) colorSpinner.place2 = colorSpinner.detectColor(2);
+//                    if (colorSpinner.detectColor(3) != 0 || colorSpinner.place3 != 0) {
+//                        if (colorSpinner.place3 == 0) {
+//                            colorSpinner.place3 = colorSpinner.detectColor(3);
+//                            stop = true;
+//                        }
+//                    } else colorSpinner.turnToAngle(colorSpinner.Place3);
+//                } else colorSpinner.turnToAngle(colorSpinner.Place2);
+//            } else
+//                colorSpinner.turnToAngle(colorSpinner.Place1);
+//        } else colorSpinner.spin.setPower(0);
+
+
+        if (gamepad1.dpad_up) test1 += 0.01;
+        if (gamepad1.dpad_down) test1 -= 0.01;
+
+        shooter.elevator.setPower(1);
+        shooter.arm.setPosition(test1);
+        shooter.shooting(2, false);
+        intake.on();
+        colorSpinner.on(0.4);
+//Z
+//        shooter.shooting(2,true);
+
+//
+//        shooter.shooterU.setPower(gamepad1.right_trigger);
+//        shooter.shooterD.setPower(gamepad1.right_trigger);
+////
+//        if (gamepad1.dpad_up) test1 = 65;  //3
+//        else if (gamepad1.dpad_left) test1 = 185;//1
+//        else if (gamepad1.dpad_right) test1 = 305;//2
+//        colorSpinner.turnToAngle(test1);
 
 
 //        intake.on();
@@ -77,24 +109,29 @@ public class Tele extends RobotBase {
 
 
         // 顯示數據
-        telemetry.addData("1.red", colorSpinner.color1.red());
-        telemetry.addData("1.blue", colorSpinner.color1.blue());
-        telemetry.addData("1.green", colorSpinner.color1.green());
-        telemetry.addData("1.alpha", colorSpinner.color1.alpha());
-        telemetry.addData("2.red", colorSpinner.color2.red());
-        telemetry.addData("2.blue", colorSpinner.color2.blue());
-        telemetry.addData("2.green", colorSpinner.color2.green());
-        telemetry.addData("2.alpha", colorSpinner.color2.alpha());
+//        telemetry.addData("1.red", colorSpinner.color1.red());
+//        telemetry.addData("1.blue", colorSpinner.color1.blue());
+//        telemetry.addData("1.green", colorSpinner.color1.green());
+//        telemetry.addData("1.alpha", colorSpinner.color1.alpha());
+//        telemetry.addData("2.red", colorSpinner.color2.red());
+//        telemetry.addData("2.blue", colorSpinner.color2.blue());
+//        telemetry.addData("2.green", colorSpinner.color2.green());
+//        telemetry.addData("2.alpha", colorSpinner.color2.alpha());
         telemetry.addData("1", colorSpinner.place1);
         telemetry.addData("2", colorSpinner.place2);
         telemetry.addData("3", colorSpinner.place3);
+//        telemetry.addData("delta", colorSpinner.delta);
+        telemetry.addData("uVelocity", shooter.shooterU.getVelocity() / 28.0 * 60.0);
+        telemetry.addData("dVelocity", shooter.shooterD.getVelocity() / 28.0 * 60.0);
+        telemetry.addData("shooterU.getVelocity()", shooter.shooterU.getVelocity());
+        telemetry.addData("shooterD.getVelocity()", shooter.shooterD.getVelocity());
         telemetry.addData("delta", colorSpinner.delta);
         telemetry.addData("test1", test1);
-        telemetry.addData("color spin pose", colorSpinner.getPose());
-        telemetry.addData("getCurrentPose", colorSpinner.getCurrentPose());
+//        telemetry.addData("color spin pose", colorSpinner.getPose());
+        telemetry.addData("getCurrentPose", colorSpinner.getDegree());
+//        telemetry.addData("sh pose", shooter.getPose());
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
-        telemetry.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Heading", Math.toDegrees(follower.getHeading()));
         telemetry.update();
     }

@@ -74,12 +74,12 @@ public abstract class RobotBase extends OpMode {
 //                .build();
 //        limelight = new LimelightSystem(hardwareMap,telemetry);
 
+        robotInit(); // 執行自定義初始化邏輯
         //setting
         colorSpinner = new ColorSpinner(hardwareMap, telemetry);
         intake = new Intake(hardwareMap, telemetry);
         shooter = new Shooter(hardwareMap, telemetry);
 
-        robotInit(); // 執行自定義初始化邏輯
 
         telemetry.addData("init", "done");
         telemetry.update();

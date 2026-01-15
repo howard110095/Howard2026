@@ -4,6 +4,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -12,6 +14,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+@Configurable
 public class ColorSpinner {
     public double delta, aim;
     public double lastPosition = 0;
@@ -19,9 +22,11 @@ public class ColorSpinner {
     public ColorSensor color1, color2;
     public CRServo spin;
     public AnalogInput spinAnalogInput;
+    private PIDController ColorSpinnerPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
 
     boolean p1 = false, p2 = false, p3 = false;
-    int place1 = 0, place2 = 0, place3 = 0; //none 0  green 4  purple 5
+    public int place1 = 0, place2 = 0, place3 = 0; //none 0  green 4  purple 5
+    public double Place1 = 305, Place2 = 185, Place3 = 65;
 
     public ColorSpinner(HardwareMap hardwareMap, Telemetry telemetry) {
         color1 = hardwareMap.get(ColorSensor.class, "color1");
@@ -41,7 +46,7 @@ public class ColorSpinner {
         return (double) spinAnalogInput.getVoltage() / spinAnalogInput.getMaxVoltage() * 360.0;
     }
 
-    public double getCurrentPose() {
+    public double getDegree() {
         double pose = getPose();
         pose -= 226.5;
         pose *= 360 / 350.4;
@@ -50,7 +55,7 @@ public class ColorSpinner {
     }
 
     public void spinToPosition(double target) {
-        delta = (target - getCurrentPose() + 720.0) % 360.0;
+        delta = (target - getDegree() + 720.0) % 360.0;
         if (delta < 15) spin.setPower(0);
         else if (delta < 30) spin.setPower(0.3);
         else spin.setPower(0.5);
@@ -58,53 +63,79 @@ public class ColorSpinner {
 
     public void scanning() {
         if (lastChange) {
-            delta = aim - getCurrentPose();
+            delta = aim - getDegree();
             if (delta < 20) {
                 spin.setPower(0);
                 lastChange = false;
             } else spin.setPower(0.2);
         } else {
             lastChange = true;
-            aim = getCurrentPose() + 360;
+            aim = getDegree() + 360;
         }
     }
 
     public void onTo() {
         spin.setPower(0.18);
-        if (305 < getCurrentPose() && getCurrentPose() < 335) { //320
-            place1 = detectColor();
-        }
-        if (185 < getPose() && getPose() < 215 && !p2) { //200
-            place2 = detectColor();
-        }
-        if (65 < getPose() && getPose() < 95 && !p3) { //80
-            place3 = detectColor();
-        }
+//        if (305 < getDegree() && getDegree() < 335) { //320
+//            place1 = detectColor();
+//        }
+//        if (185 < getDegree() && getDegree() < 215 && !p2) { //200
+//            place2 = detectColor();
+//        }
+//        if (65 < getDegree() && getDegree() < 95 && !p3) { //80
+//            place3 = detectColor();
+//        }
 
     }
 
-    public void colorRenew() {
-        p1 = false;
-        p2 = false;
-        p3 = false;
-        place1 = 0;
-        place2 = 0;
-        place3 = 0;
-    }
+//    public void colorRenew() {
+//        p1 = false;
+//        p2 = false;
+//        p3 = false;
+//        place1 = 0;
+//        place2 = 0;
+//        place3 = 0;
+//    }
 
     public void check() {
         if (!(p1 && p2 && p3)) spin.setPower(0.18);
         else spin.setPower(0);
     }
 
-    public int detectColor() {
-        if (color1.alpha() > 350) {
-            if (color1.blue() > color1.green()) return 5;
-            else return 4;
-        } else if (color2.alpha() > 350) {
-            if (color2.blue() > color2.green()) return 5;
-            else return 4;
+    public int detectColor(int place) {
+        boolean detect = false;
+        if (place == 1 && 275 < getDegree() && getDegree() < 335) detect = true;
+        if (place == 2 && 155 < getDegree() && getDegree() < 215) detect = true;
+        if (place == 3 && 35 < getDegree() && getDegree() < 95) detect = true;
+        if (detect) {
+            if (color1.blue() + color1.green() > 1000) {
+                if (color1.blue() > color1.green()) return 5;
+                else return 4;
+            } else if (color2.blue() + color2.green() > 1000) {
+                if (color2.blue() > color2.green()) return 5;
+                else return 4;
+            } else return 0;
         } else return 0;
+    }
+
+
+    public void turnToAngle(double targetAngle) {
+        double currentAngle = getDegree(); // 0~360
+        delta = targetAngle - currentAngle;
+        delta = (delta + 540) % 360 - 180;
+        ColorSpinnerPID.setPID(0.007, 0, 0);
+        double power = ColorSpinnerPID.calculate(0, -delta);
+        power = clamp(power, -0.3, 0.3);
+
+//        if (Math.abs(delta) < 2) {
+//            power = 0; // 已到達
+//        } else if (delta > 0) {
+//            power = 1.0;  // 順時針最快
+//        } else {
+//            power = -1.0; // 逆時針最快
+//        }
+
+        spin.setPower(power);
     }
 }
 /*
