@@ -56,34 +56,47 @@ public class Shooter {
     }
 
     public void noVisionTracking(int pipe) {
-        double targetX = 0, targetY = 0;
+        double targetX = 0, targetY = 0, targetDegree = 0;
         if (pipe == 0) {  //red
             targetX = 66;
             targetY = 66;
         } else if (pipe == 1) {  //middle
             targetX = 0;
-            targetY = 30;
+            targetY = 72;
         } else if (pipe == 2) {  //blue
             targetX = -66;
             targetY = 66;
         }
-        double slope = (follower.getPose().getY() - targetY) / (follower.getPose().getX() - targetX);
-        double heading = Math.toDegrees(follower.getPose().getHeading());
-        if (heading < 0) heading += 360.0;
-        if (pipe == 0) { //red
-            if (heading <= 135) toDegree(45 - heading);
-            else if (315 <= heading) toDegree(405 - heading);
-            else if (135 < heading && heading <= 225) toDegree(-90);
-            else toDegree(90);
-        } else if (pipe == 2) { //blue
-            if (45 <= heading && heading <= 225) toDegree(135 - heading);
-            else if (225 < heading && heading <= 315) toDegree(-90);
-            else toDegree(90);
-        } else if (pipe == 1) {  //middle
-            if (0 <= heading && heading <= 180) toDegree(90 - heading);
-            else if (180 < heading && heading <= 270) toDegree(-90);
-            else toDegree(90);
+
+        if (false) {
+            if (follower.getPose().getX() == targetX) targetDegree = 90;
+            else if (targetY < follower.getPose().getY() && follower.getPose().getX() < targetX)
+                targetDegree = 0;
+            else if (targetY < follower.getPose().getY() && follower.getPose().getX() > targetX)
+                targetDegree = 180;
+            else {
+                double slope = (follower.getPose().getY() - targetY) / (follower.getPose().getX() - targetX);
+                double delta = Math.toDegrees(Math.atan(slope));
+                if (delta > 0) targetDegree = delta;
+                else targetDegree = 180 + delta;
+            }
+
+        } else {
+            double dx = targetX - follower.getPose().getX();
+            double dy = targetY - follower.getPose().getY();
+
+            if (dy < 0) { // 目標在上方（依你的座標定義）
+                targetDegree = (dx >= 0) ? 0 : 180;   // 右上→0，左上→180
+            } else {
+                targetDegree = Math.toDegrees(Math.atan2(dy, dx));
+            }
         }
+
+
+        double heading = Math.toDegrees(follower.getPose().getHeading());
+        double degree = ((targetDegree - heading + 540) % 360) - 180;
+        degree = clamp(degree, -90, 90);
+        toDegree(degree);
     }
 
     public void visionTracking(int pipe) {
