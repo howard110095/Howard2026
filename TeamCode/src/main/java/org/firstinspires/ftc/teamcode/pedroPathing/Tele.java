@@ -46,6 +46,10 @@ public class Tele extends RobotBase {
 //                colorSpinner.turnToAngle(colorSpinner.Place1);
 //        } else colorSpinner.spin.setPower(0);
 
+        if (gamepad1.dpad_up) test1 = 1;  //3
+        else if (gamepad1.dpad_left) test1 = 2;//1
+        else if (gamepad1.dpad_right) test1 = 0;//2
+        shooter.noVisionTracking((int) test1);
 
 
 //Z

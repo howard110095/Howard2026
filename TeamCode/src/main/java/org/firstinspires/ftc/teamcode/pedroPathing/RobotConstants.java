@@ -20,11 +20,15 @@ public class RobotConstants {
 
 
 
-    public static Pose startBlueLongShootPose = new Pose(-15, -57.5, Math.toRadians(180));
-    public static Pose startBlueLongPose = new Pose(-24, -60, Math.toRadians(135));
-    public static Pose blueRoll3_2 = new Pose(-50, -24, Math.toRadians(135));
-    public static Pose blueCorner = new Pose(-58, -55, Math.toRadians(180));
+    public static Pose blueLongShootingPose = new Pose(-15, -57.5, Math.toRadians(180));
+//    public static Pose startBlueLongPose = new Pose(-24, -60, Math.toRadians(135));
+    public static Pose startBlueLongPose = new Pose(-15, -57.5, Math.toRadians(90));
+//    public static Pose startBlueLongPose = new Pose(-15, -57.5, Math.toRadians(180));
+    public static Pose blueRoll3_2 = new Pose(-55, -36, Math.toRadians(180));
+    public static Pose blueCorner = new Pose(-58, -58.5, Math.toRadians(180));
 
 
     //red pose
+
+    public static Pose control = new Pose(-15, -36, Math.toRadians(180));
 }

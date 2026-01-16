@@ -25,15 +25,15 @@ public class Auto2 extends RobotBase {
         path0 = follower.pathBuilder()
                 .addPath(new BezierLine(startBlueLongPose, blueRoll3_2))
                 .setLinearHeadingInterpolation(startBlueLongPose.getHeading(), blueRoll3_2.getHeading())
-                .addPath(new BezierLine(blueRoll3_2, startBlueLongShootPose))
-                .setLinearHeadingInterpolation(blueRoll3_2.getHeading(), startBlueLongShootPose.getHeading())
+                .addPath(new BezierLine(blueRoll3_2, blueLongShootingPose))
+                .setLinearHeadingInterpolation(blueRoll3_2.getHeading(), blueLongShootingPose.getHeading())
                 .build();
 
         path1 = follower.pathBuilder()
-                .addPath(new BezierLine(startBlueLongShootPose, blueCorner))
-                .setLinearHeadingInterpolation(startBlueLongShootPose.getHeading(), blueCorner.getHeading())
-                .addPath(new BezierLine(blueCorner, startBlueLongShootPose))
-                .setLinearHeadingInterpolation(blueCorner.getHeading(), startBlueLongShootPose.getHeading())
+                .addPath(new BezierLine(blueLongShootingPose, blueCorner))
+                .setLinearHeadingInterpolation(blueLongShootingPose.getHeading(), blueCorner.getHeading())
+                .addPath(new BezierLine(blueCorner, blueLongShootingPose))
+                .setLinearHeadingInterpolation(blueCorner.getHeading(), blueLongShootingPose.getHeading())
                 .build();
 
 //        path2 = follower.pathBuilder()
