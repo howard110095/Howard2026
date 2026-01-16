@@ -31,25 +31,23 @@ public class Tele extends RobotBase {
     @Override
     public void robotLoop() {
 //        if (!stop) {
-//            if (colorSpinner.detectColor(1) != 0 || colorSpinner.place1 != 0) {
-//                if (colorSpinner.place1 == 0) colorSpinner.place1 = colorSpinner.detectColor(1);
-//                if (colorSpinner.detectColor(2) != 0 || colorSpinner.place2 != 0) {
-//                    if (colorSpinner.place2 == 0) colorSpinner.place2 = colorSpinner.detectColor(2);
-//                    if (colorSpinner.detectColor(3) != 0 || colorSpinner.place3 != 0) {
-//                        if (colorSpinner.place3 == 0) {
-//                            colorSpinner.place3 = colorSpinner.detectColor(3);
-//                            stop = true;
-//                        }
-//                    } else colorSpinner.turnToAngle(colorSpinner.Place3);
-//                } else colorSpinner.turnToAngle(colorSpinner.Place2);
-//            } else
-//                colorSpinner.turnToAngle(colorSpinner.Place1);
+
 //        } else colorSpinner.spin.setPower(0);
+
 
         if (gamepad1.dpad_up) test1 = 1;  //3
         else if (gamepad1.dpad_left) test1 = 2;//1
         else if (gamepad1.dpad_right) test1 = 0;//2
-        shooter.noVisionTracking((int) test1);
+        shooter.visionTracking((int) test1);
+        //shooting
+        shooter.shooting((int) test1, gamepad1.right_bumper);
+        //spinner
+        if (gamepad1.right_bumper) colorSpinner.spin.setPower(0.3);
+        else colorSpinner.spin.setPower(0.18);
+        //intake
+        if (gamepad1.left_bumper) intake.on();
+        else if (gamepad1.left_trigger < 0.5) intake.out();
+        else intake.off();
 
 
 //Z
@@ -100,7 +98,7 @@ public class Tele extends RobotBase {
         // 底盤遙控
         double axial = -gamepad1.left_stick_y;
         double lateral = -gamepad1.left_stick_x;
-        double yaw = gamepad1.right_stick_x * 0.6;
+        double yaw = gamepad1.right_stick_x;
         follower.update();
         follower.setTeleOpDrive(axial, lateral, -yaw * 0.5, true);
 

@@ -16,15 +16,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Configurable
 public class ColorSpinner {
-    public double delta, aim;
-    public double lastPosition = 0;
-    public boolean lastChange = false;
+    public double delta;
     public ColorSensor color1, color2;
     public CRServo spin;
     public AnalogInput spinAnalogInput;
     private PIDController ColorSpinnerPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
 
-    boolean p1 = false, p2 = false, p3 = false;
     public int place1 = 0, place2 = 0, place3 = 0; //none 0  green 4  purple 5
     public double Place1 = 305, Place2 = 185, Place3 = 65;
 
@@ -42,6 +39,7 @@ public class ColorSpinner {
         spin.setPower(power);
     }
 
+
     public double getPose() {
         return (double) spinAnalogInput.getVoltage() / spinAnalogInput.getMaxVoltage() * 360.0;
     }
@@ -54,59 +52,18 @@ public class ColorSpinner {
         return pose;
     }
 
-    public void spinToPosition(double target) {
-        delta = (target - getDegree() + 720.0) % 360.0;
-        if (delta < 15) spin.setPower(0);
-        else if (delta < 30) spin.setPower(0.3);
-        else spin.setPower(0.5);
-    }
 
-    public void scanning() {
-        if (lastChange) {
-            delta = aim - getDegree();
-            if (delta < 20) {
-                spin.setPower(0);
-                lastChange = false;
-            } else spin.setPower(0.2);
-        } else {
-            lastChange = true;
-            aim = getDegree() + 360;
-        }
-    }
-
-    public void onTo() {
-        spin.setPower(0.18);
-//        if (305 < getDegree() && getDegree() < 335) { //320
-//            place1 = detectColor();
-//        }
-//        if (185 < getDegree() && getDegree() < 215 && !p2) { //200
-//            place2 = detectColor();
-//        }
-//        if (65 < getDegree() && getDegree() < 95 && !p3) { //80
-//            place3 = detectColor();
-//        }
-
-    }
-
-//    public void colorRenew() {
-//        p1 = false;
-//        p2 = false;
-//        p3 = false;
-//        place1 = 0;
-//        place2 = 0;
-//        place3 = 0;
-//    }
-
-    public void check() {
-        if (!(p1 && p2 && p3)) spin.setPower(0.18);
-        else spin.setPower(0);
+    public void colorRenew() {
+        place1 = 0;
+        place2 = 0;
+        place3 = 0;
     }
 
     public int detectColor(int place) {
         boolean detect = false;
-        if (place == 1 && 275 < getDegree() && getDegree() < 335) detect = true;
-        if (place == 2 && 155 < getDegree() && getDegree() < 215) detect = true;
-        if (place == 3 && 35 < getDegree() && getDegree() < 95) detect = true;
+        if (place == 1 && Math.abs(getDegree() - Place1) < 30) detect = true;
+        if (place == 2 && Math.abs(getDegree() - Place2) < 30) detect = true;
+        if (place == 3 && Math.abs(getDegree() - Place3) < 30) detect = true;
         if (detect) {
             if (color1.blue() + color1.green() > 1000) {
                 if (color1.blue() > color1.green()) return 5;
@@ -119,6 +76,19 @@ public class ColorSpinner {
     }
 
 
+    public void detect3pose() {
+        if (detectColor(1) != 0 || place1 != 0) {
+            if (place1 == 0) place1 = detectColor(1);
+            if (detectColor(2) != 0 || place2 != 0) {
+                if (place2 == 0) place2 = detectColor(2);
+                if (detectColor(3) != 0 || place3 != 0) {
+                    if (place3 == 0) place3 = detectColor(3);
+                    spin.setPower(0);
+                } else turnToAngle(Place3);
+            } else turnToAngle(Place2);
+        } else turnToAngle(Place1);
+    }
+
     public void turnToAngle(double targetAngle) {
         double currentAngle = getDegree(); // 0~360
         delta = targetAngle - currentAngle;
@@ -126,35 +96,6 @@ public class ColorSpinner {
         ColorSpinnerPID.setPID(0.007, 0, 0);
         double power = ColorSpinnerPID.calculate(0, -delta);
         power = clamp(power, -0.3, 0.3);
-
-//        if (Math.abs(delta) < 2) {
-//            power = 0; // 已到達
-//        } else if (delta > 0) {
-//            power = 1.0;  // 順時針最快
-//        } else {
-//            power = -1.0; // 逆時針最快
-//        }
-
         spin.setPower(power);
     }
 }
-/*
-    public double Rpercent() {
-        return (double) CS.red() / (CS.red() + CS.green() + CS.blue());
-    }
-
-    public double Gpercent() {
-        return (double) CS.green() / (CS.red() + CS.green() + CS.blue());
-    }
-
-    public double Bpercent() {
-        return (double) CS.blue() / (CS.red() + CS.green() + CS.blue());
-    }
-
-    public int color_detect() {
-        if (Rpercent() < 0.45 && Bpercent() < 0.2) return 2; //yellow
-        else if (Rpercent() > 0.35) return 1; //red
-        else if (Bpercent() > 0.42) return 3; //blue
-        else return 0;
-    }
-*/

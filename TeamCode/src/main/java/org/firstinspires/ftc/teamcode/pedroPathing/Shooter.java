@@ -19,25 +19,28 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Configurable
 public class Shooter {
     public DcMotorEx shooterU, shooterD, elevator;
-    public Servo arm;
+    public Servo arm, turretPitchL, turretPitchR;
     public CRServo shooterSpinner1, shooterSpinner2;
     public AnalogInput aimAnalogInput;
     public Limelight3A limelight;
-
     private PIDController SpinnerPID = new PIDController(0.02, 0, 0.02); // 手臂 PID 控制器
     private PIDController ShooterUPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
     private PIDController ShooterDPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
     public static double ukP = 0.001, ukI = 0.001, ukD = 0, dkP = 0.001, dkI = 0.001, dkD = 0;
     public static double spinP = 0.015, spinD = 0;
-    public double shooterVelocity = 2000, uVelocity, dVelocity, uError, dError, shooterU_power, shooterD_power;
+    public double shooterVelocity = 2000, uVelocity, dVelocity, shooterU_power, shooterD_power;
 
     public Shooter(HardwareMap hardwareMap, Telemetry telemetry) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         shooterSpinner1 = hardwareMap.get(CRServo.class, "aimX1");
         shooterSpinner2 = hardwareMap.get(CRServo.class, "aimX2");
+        turretPitchL = hardwareMap.get(Servo.class, "aimYL");
+        turretPitchR = hardwareMap.get(Servo.class, "aimYR");
+        arm = hardwareMap.get(Servo.class, "arm");
         aimAnalogInput = hardwareMap.get(AnalogInput.class, "aimAnalogInput");
         shooterU = hardwareMap.get(DcMotorEx.class, "shooterU");
         shooterD = hardwareMap.get(DcMotorEx.class, "shooterD");
+        elevator = hardwareMap.get(DcMotorEx.class, "feed");
 
         shooterU.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterU.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
@@ -45,14 +48,11 @@ public class Shooter {
         shooterD.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterD.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         shooterD.setPower(0);
+        elevator.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        elevator.setPower(0);
 
         shooterSpinner1.setPower(0);
         shooterSpinner2.setPower(0);
-
-        arm = hardwareMap.get(Servo.class, "arm");
-        elevator = hardwareMap.get(DcMotorEx.class, "feed");
-        elevator.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        elevator.setPower(0);
     }
 
     public void noVisionTracking(int pipe) {
@@ -68,29 +68,13 @@ public class Shooter {
             targetY = 66;
         }
 
-        if (false) {
-            if (follower.getPose().getX() == targetX) targetDegree = 90;
-            else if (targetY < follower.getPose().getY() && follower.getPose().getX() < targetX)
-                targetDegree = 0;
-            else if (targetY < follower.getPose().getY() && follower.getPose().getX() > targetX)
-                targetDegree = 180;
-            else {
-                double slope = (follower.getPose().getY() - targetY) / (follower.getPose().getX() - targetX);
-                double delta = Math.toDegrees(Math.atan(slope));
-                if (delta > 0) targetDegree = delta;
-                else targetDegree = 180 + delta;
-            }
 
-        } else {
-            double dx = targetX - follower.getPose().getX();
-            double dy = targetY - follower.getPose().getY();
-
-            if (dy < 0) { // 目標在上方（依你的座標定義）
-                targetDegree = (dx >= 0) ? 0 : 180;   // 右上→0，左上→180
-            } else {
-                targetDegree = Math.toDegrees(Math.atan2(dy, dx));
-            }
-        }
+        double dx = targetX - follower.getPose().getX();
+        double dy = targetY - follower.getPose().getY();
+        if (dy < 0)  // 目標在上方（依你的座標定義）
+            targetDegree = (dx >= 0) ? 0 : 180;   // 右上→0，左上→180
+        else
+            targetDegree = Math.toDegrees(Math.atan2(dy, dx));
 
 
         double heading = Math.toDegrees(follower.getPose().getHeading());
@@ -160,10 +144,6 @@ public class Shooter {
         shooterD.setPower(1);
     }
 
-//    public void slowMode() {
-//        shooterU.setPower(0.7);
-//        shooterD.setPower(0.7);
-//    }
 
     public void shooterOff() {
         shooterU.setPower(0);
@@ -186,7 +166,7 @@ public class Shooter {
 
     public double getDegree() {
         double reset = 325;
-        if (getPose() < 100) return (getPose() - reset + 350) * 90.0 / 88.0;
+        if (getPose() < 150) return (getPose() - reset + 350) * 90.0 / 88.0;
         else return (getPose() - reset) * 90.0 / 88.0;
     }
 
@@ -194,7 +174,6 @@ public class Shooter {
         target = clamp(target, -90, 90);
         SpinnerPID.setPID(spinP, 0, spinD);
         double power = SpinnerPID.calculate(getDegree(), target);
-//        double power = (target - getDegree()) * 0.02;
         power = clamp(power, -1, 1);
         shooterSpinner1.setPower(power);
         shooterSpinner2.setPower(power);

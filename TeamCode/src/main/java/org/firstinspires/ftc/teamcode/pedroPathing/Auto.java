@@ -47,16 +47,7 @@ public class Auto extends RobotBase {
                 .addPath(new BezierCurve(blueRoll3, blueControl3, shootingBluePose))
                 .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
                 .build();
-//
-//        .
-//        addPath(new BezierCurve(new Point(preloadPose), new Point(15, 36, Point.CARTESIAN), new Point(61, 36.25, Point.CARTESIAN), new Point(59, 26.000, Point.CARTESIAN)))
-//                .setLinearHeadingInterpolation(preloadPose.getHeading(), Math.toRadians(180))
-//                .addPath(new BezierLine(new Point(59.000, 26.000, Point.CARTESIAN), new Point(28, 26.000, Point.CARTESIAN)))
-//                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
 
-
-//        park = new Path(new BezierCurve(scorePose, parkControlPose, parkPose));
-//        park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
     }
 
     public void autonomousPathUpdate() {

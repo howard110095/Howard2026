@@ -41,18 +41,9 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 public abstract class RobotBase extends OpMode {
     public static Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
-    private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
     private TelemetryManager telemetryM;
-    private boolean slowMode = false;
-    private double slowModeMultiplier = 0.5;
 
-    //-----------------------------------------
-//    public final Pose startPose = new Pose(0, 0, 0);
-//    private PIDController ArmPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
-//    private PIDController SlidePID = new PIDController(0, 0, 0); // 升降滑軌 PID 控制器
-
-    //
     protected ColorSpinner colorSpinner;  // 這樣 Tele/Auto 都可以使用;
     protected Shooter shooter;  // 這樣 Tele/Auto 都可以使用
     protected Intake intake;  // 這樣 Tele/Auto 都可以使用
@@ -68,11 +59,6 @@ public abstract class RobotBase extends OpMode {
         follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
         follower.update();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-//        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-//                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
-//                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
-//                .build();
-//        limelight = new LimelightSystem(hardwareMap,telemetry);
 
         robotInit(); // 執行自定義初始化邏輯
         //setting
@@ -116,30 +102,5 @@ public abstract class RobotBase extends OpMode {
     protected abstract void robotLoop();
 
     protected abstract void robotStop();
-
-    // 手臂轉動到指定角度
-    public void armTurn2angle(double target) {
-//        armPosNow = ArmUp.getCurrentPosition() / armEnc2deg + armOffset; // 計算當前角度
-//        if (slidePosNow >= 50 && target <= 15 && armPosNow > 15) target = armPosNow;
-//        target = clamp(target, armBottomLimit, armUpLimit); // 限制目標角度範圍
-//        //28 -> 0 ; 80 -> 0.16
-//        armF = (slidePosNow - smin) / (smax - smin) * 0.16 + 0;// 計算前饋
-//        ArmPID.setPID(armP, armI, armD); // 設置 PID
-//        ArmPID.setTolerance(10); // 設置誤差容忍度
-//        armOutput = ArmPID.calculate(armPosNow, target) + armF * Math.cos(Math.toRadians(armPosNow))/* */; // 計算輸出
-//        armOutput = clamp(armOutput, armPowerMin, armPowerMax); // 限制輸出範圍
-//        ArmUp.setPower(armOutput);
-//        ArmDown.setPower(armOutput);
-    }
-
-    // 滑軌移動到指定位置
-    public void slideToPosition(double slidePos) {
-//        slidePosNow = (SlideBack.getCurrentPosition() / slide2length) * 2 + smin + slideOffset; // 計算當前位置
-//        slidePos = clamp(slidePos, smin, smax); // 限制目標範圍
-//        SlidePID.setPID(slideP, slideI, slideD); // 設置 PID
-//        slidePower = SlidePID.calculate(slidePosNow, slidePos) + Math.sin(Math.toRadians(slidePosNow)) * slideF; // 計算輸出
-//        SlideFront.setPower(slidePower);
-//        SlideBack.setPower(slidePower);
-    }
 
 }
