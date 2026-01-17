@@ -68,22 +68,13 @@ public class Tele extends RobotBase {
 
 
         // 顯示數據
-//        telemetry.addData("1.red", colorSpinner.color1.red());
-//        telemetry.addData("1.blue", colorSpinner.color1.blue());
-//        telemetry.addData("1.green", colorSpinner.color1.green());
-//        telemetry.addData("1.alpha", colorSpinner.color1.alpha());
-//        telemetry.addData("2.red", colorSpinner.color2.red());
-//        telemetry.addData("2.blue", colorSpinner.color2.blue());
-//        telemetry.addData("2.green", colorSpinner.color2.green());
-//        telemetry.addData("2.alpha", colorSpinner.color2.alpha());
-
         telemetry.addData("getLatestResult", shooter.limelight.getLatestResult().getTx());
         telemetry.addData("shooterU.getPower", shooter.shooterU.getPower());
         telemetry.addData("shooterD.getPower", shooter.shooterD.getPower());
 //        telemetry.addData("1", colorSpinner.place1);
 //        telemetry.addData("2", colorSpinner.place2);
 //        telemetry.addData("3", colorSpinner.place3);
-//        telemetry.addData("shooter.getPose()", shooter.getPose());
+        telemetry.addData("shooter.getPose()", shooter.getPose());
         telemetry.addData("uVelocity", shooter.shooterU.getVelocity() / 28.0 * 60.0);
         telemetry.addData("dVelocity", shooter.shooterD.getVelocity() / 28.0 * 60.0);
 //        telemetry.addData("shooterU.getVelocity()", shooter.shooterU.getVelocity());

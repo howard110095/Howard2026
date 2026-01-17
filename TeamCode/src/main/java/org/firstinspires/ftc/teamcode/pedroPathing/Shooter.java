@@ -26,6 +26,7 @@ public class Shooter {
     private PIDController SpinnerPID = new PIDController(0.02, 0, 0.02);
     private PIDController ShooterUPID = new PIDController(0, 0, 0);
     private PIDController ShooterDPID = new PIDController(0, 0, 0);
+    public static boolean controlShooting = false;
     public static double ukP = 0.015, ukI = 0.0015, ukD = 0, dkP = 0.015, dkI = 0.0015, dkD = 0;
     public static double spinP = 0.007;
     public double shooterVelocity = 2000, uVelocity, dVelocity, shooterU_power, shooterD_power;
@@ -110,10 +111,13 @@ public class Shooter {
         shooterD_power = clamp(shooterD_power, 0, 1);
         shooterU.setPower(shooterU_power);
         shooterD.setPower(shooterD_power);
-        if (Auto.sh) elevatorUp();
-
-        else if (on && velocity - 350 < uVelocity && velocity - 350 < dVelocity) Auto.sh = true;
-        else elevatorOff();
+        if (controlShooting && on) elevatorUp();
+        else if (on && velocity - 500 < uVelocity && velocity - 500 < dVelocity)
+            controlShooting = true;
+        else {
+            elevatorOff();
+            controlShooting = false;
+        }
     }
 
     public void shooting(int pipe, boolean on) {
@@ -125,7 +129,7 @@ public class Shooter {
             else shooterVelocity = 4100;
         } else {
             double dx = dx(pipe), dy = dy(pipe);
-            //shooterVelocity   pitchDegree
+            shooterVelocity = 4100;
         }
         //set power
         uVelocity = shooterU.getVelocity() / 28.0 * 60.0;
@@ -166,6 +170,9 @@ public class Shooter {
         double reset = 325;
         if (getPose() < 150) return (getPose() - reset + 350) * 90.0 / 88.0;
         else return (getPose() - reset) * 90.0 / 88.0;
+//        double reset = 143;
+//        if (getPose() > 318) return (getPose() - reset - 350) * 90.0 / 88.0;
+//        else return (getPose() - reset) * 90.0 / 88.0;
     }
 
     public void toDegree(double target) {

@@ -19,9 +19,9 @@ public class Auto extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Path park;
-    private PathChain path0, path1, path2, path3;
+    private PathChain path0, path1_go, path1_back, path2, path3;
 
-    public static boolean sh = false;
+    public static boolean spinDETECT = false;
 
     public void buildPaths() {
         path0 = follower.pathBuilder()
@@ -29,9 +29,11 @@ public class Auto extends RobotBase {
                 .setLinearHeadingInterpolation(startBluePose.getHeading(), shootingBluePose.getHeading())
                 .build();
 
-        path1 = follower.pathBuilder()
+        path1_go = follower.pathBuilder()
                 .addPath(new BezierLine(shootingBluePose, blueRoll1))
                 .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll1.getHeading())
+                .build();
+        path1_back = follower.pathBuilder()
                 .addPath(new BezierLine(blueRoll1, shootingBluePose))
                 .setLinearHeadingInterpolation(blueRoll1.getHeading(), shootingBluePose.getHeading())
                 .build();
@@ -73,26 +75,32 @@ public class Auto extends RobotBase {
                 intake.on();
                 shooter.setVelocity(AutoVelocity, false);
                 colorSpinner.on(0.18);
-                follower.followPath(path1, true);
+                follower.followPath(path1_go, true);
                 colorSpinner.colorRenew();
                 setPathState(12);
             }
         } else if (pathState == 12) {
-            if (follower.getPose().getX() < -40) setPathState(13);
-        } else if (pathState == 13) {
-            if (follower.getPose().getX() > -35) {
-                colorSpinner.detect3pose();
-                setPathState(14);
+            if (!follower.isBusy()) {
+                setPathState(13);
             }
+        } else if (pathState == 13) {
+            if (pathTimer.getElapsedTimeSeconds() > 2) setPathState(14);
         } else if (pathState == 14) {
+            spinDETECT = true;
+            intake.on();
+            follower.followPath(path1_back, true);
+            setPathState(15);
+        }
+        //
+        else if (pathState == 15) {
             if (!follower.isBusy()) {
                 intake.off();
-                setPathState(15);
+                setPathState(16);
             }
-        } else if (pathState == 15) {
-            sh = false;
-            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(16);
         } else if (pathState == 16) {
+            if (pathTimer.getElapsedTimeSeconds() >= 3) setPathState(-1);
+        } else if (pathState == 17) {
+            spinDETECT = false;
             intake.off();
             colorSpinner.on(1);
             shooter.setVelocity(AutoVelocity, true);
@@ -138,6 +146,8 @@ public class Auto extends RobotBase {
         } else if (pathState == 33) {
             if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(34);
         } else {
+            spinDETECT = false;
+            shooter.elevatorOff();
             intake.off();
             colorSpinner.on(0);
             shooter.shooterPower(0);
@@ -154,10 +164,18 @@ public class Auto extends RobotBase {
         follower.update();
         autonomousPathUpdate();
         //vision
-        shooter.visionTracking(2);
+//        shooter.visionTracking(2);
         shooter.pitchDegree(43);
+        shooter.visionTracking(2);
         // These loop the movements of the robot
 
+        if (spinDETECT) {
+            colorSpinner.detect3pose();
+        }
+
+        telemetry.addData("1", colorSpinner.place1);
+        telemetry.addData("2", colorSpinner.place2);
+        telemetry.addData("3", colorSpinner.place3);
         telemetry.addData("getTx", shooter.limelight.getLatestResult().getTx());
         telemetry.addData("uVelocity", shooter.uVelocity);
         telemetry.addData("dVelocity", shooter.dVelocity);

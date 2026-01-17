@@ -19,39 +19,19 @@ public class AutoTest extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Path park;
-    private PathChain path0,path00, path1, path2, path3;
+    private PathChain path0, path00;
 
     public void buildPaths() {
         path0 = follower.pathBuilder()
-                .addPath(new BezierLine(startBlueLongPose, shootingBluePose))
-                .setLinearHeadingInterpolation(startBlueLongPose.getHeading(), shootingBluePose.getHeading())
+                .addPath(new BezierLine(s0_0, s0_1))
+                .setLinearHeadingInterpolation(s0_0.getHeading(), s0_1.getHeading())
                 .build();
 
-        path00= follower.pathBuilder()
-                .addPath(new BezierLine(startBlueLongPose, shootingBluePose))
-                .setLinearHeadingInterpolation(startBlueLongPose.getHeading(), shootingBluePose.getHeading())
+        path00 = follower.pathBuilder()
+                .addPath(new BezierLine(follower.getPose(), s0_0))
+                .setLinearHeadingInterpolation(follower.getPose().getHeading(), s0_0.getHeading())
                 .build();
 
-        path1 = follower.pathBuilder()
-                .addPath(new BezierLine(shootingBluePose, blueRoll1))
-                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll1.getHeading())
-                .addPath(new BezierLine(blueRoll1, shootingBluePose))
-                .setLinearHeadingInterpolation(blueRoll1.getHeading(), shootingBluePose.getHeading())
-                .build();
-
-        path2 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootingBluePose, blueControl2, blueRoll2))
-                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll2.getHeading())
-                .addPath(new BezierCurve(blueRoll2, blueControl2, shootingBluePose))
-                .setLinearHeadingInterpolation(blueRoll2.getHeading(), shootingBluePose.getHeading())
-                .build();
-
-        path3 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootingBluePose, blueControl3, blueRoll3))
-                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll3.getHeading())
-                .addPath(new BezierCurve(blueRoll3, blueControl3, shootingBluePose))
-                .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
-                .build();
 
     }
 
@@ -59,7 +39,25 @@ public class AutoTest extends RobotBase {
         if (pathState == 0) {
             follower.followPath(path0, true);
             setPathState(1);
+        } else if (pathState == 1) {
+            if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 1.25) {
+                if (pathTimer.getElapsedTimeSeconds() > 1.25) {
+                    follower.breakFollowing();
+                }
+                setPathState(2);
+            }
+        } else if (pathState == 2) {
+            if (!follower.isBusy()) {
+                follower.followPath(path00, true);
+                setPathState(3);
+            }
+        } else if (pathState == 3) {
+            if (!follower.isBusy()) {
+                follower.breakFollowing();
+                setPathState(-1);
+            }
         }
+
 
     }
 
@@ -72,17 +70,6 @@ public class AutoTest extends RobotBase {
     public void robotLoop() {
         follower.update();
         autonomousPathUpdate();
-        //vision
-        if (pathState == 12 && follower.getPose().getX() < -30) shooter.visionTracking(1);
-        else shooter.visionTracking(2);
-        // These loop the movements of the robot
-
-        telemetry.addData("uVelocity", shooter.limelight.getLatestResult().getTx());
-        telemetry.addData("uVelocity", shooter.uVelocity);
-        telemetry.addData("dVelocity", shooter.dVelocity);
-        telemetry.addData("dVelocity", shooter.shooterVelocity);
-        telemetry.addData("shooterU_power", shooter.shooterU_power);
-        telemetry.addData("shooterD_power", shooter.shooterD_power);
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
@@ -100,7 +87,7 @@ public class AutoTest extends RobotBase {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 //        startingPose = startBluePose;
-        follower.setStartingPose(startBlueLongPose);
+        follower.setStartingPose(s0_0);
         buildPaths();
     }
 
