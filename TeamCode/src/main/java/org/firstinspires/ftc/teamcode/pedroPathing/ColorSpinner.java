@@ -34,11 +34,9 @@ public class ColorSpinner {
         spin.setPower(0);
     }
 
-    // 你可以加一些方法來控制 spinner，例如：
     public void on(double power) {
         spin.setPower(power);
     }
-
 
     public double getPose() {
         return (double) spinAnalogInput.getVoltage() / spinAnalogInput.getMaxVoltage() * 360.0;
@@ -51,7 +49,6 @@ public class ColorSpinner {
         if (pose < 0) pose += 360;
         return pose;
     }
-
 
     public void colorRenew() {
         place1 = 0;

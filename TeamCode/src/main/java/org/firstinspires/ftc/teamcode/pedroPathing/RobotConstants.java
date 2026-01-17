@@ -3,8 +3,9 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 import com.pedropathing.geometry.Pose;
 
 public class RobotConstants {
-    public static double shootingTime = 2.5;
+    public static double shootingTime = 3;
 
+    public static double AutoVelocity = 3800;
 
 
 

@@ -21,6 +21,8 @@ public class Auto extends RobotBase {
     private Path park;
     private PathChain path0, path1, path2, path3;
 
+    public static boolean sh = false;
+
     public void buildPaths() {
         path0 = follower.pathBuilder()
                 .addPath(new BezierLine(startBluePose, shootingBluePose))
@@ -53,40 +55,48 @@ public class Auto extends RobotBase {
     public void autonomousPathUpdate() {
         if (pathState == 0) {
             intake.off();
-            colorSpinner.on(0.4);
-            shooter.shooting(2, false);
+            shooter.setVelocity(AutoVelocity, false);
             follower.followPath(path0, true);
             setPathState(1);
         } else if (pathState == 1) {
-            if (follower.getPose().getY() < 35) {
-                shooter.shooting(2, true);
+            if (!follower.isBusy()) {
                 setPathState(2);
             }
-        }else if (pathState == 2) {
-            if (!follower.isBusy()) {
-                setPathState(3);
-            }
-        }else if (pathState == 3) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(11);
+        } else if (pathState == 2) {
+            colorSpinner.on(1);
+            shooter.setVelocity(AutoVelocity, true);
+            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(11);
         }
         //to 1 roll
         else if (pathState == 11) {
             if (!follower.isBusy()) {
                 intake.on();
-                shooter.shooting(2, false);
+                shooter.setVelocity(AutoVelocity, false);
                 colorSpinner.on(0.18);
                 follower.followPath(path1, true);
+                colorSpinner.colorRenew();
                 setPathState(12);
             }
         } else if (pathState == 12) {
+            if (follower.getPose().getX() < -40) setPathState(13);
+        } else if (pathState == 13) {
+            if (follower.getPose().getX() > -35) {
+                colorSpinner.detect3pose();
+                setPathState(14);
+            }
+        } else if (pathState == 14) {
             if (!follower.isBusy()) {
                 intake.off();
-                colorSpinner.on(0.4);
-                shooter.shooting(2, true);
-                setPathState(13);
+                setPathState(15);
             }
-        } else if (pathState == 13) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(21);
+        } else if (pathState == 15) {
+            sh = false;
+            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(16);
+        } else if (pathState == 16) {
+            intake.off();
+            colorSpinner.on(1);
+            shooter.setVelocity(AutoVelocity, true);
+            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(-1);
         }
         //to 2 roll
         else if (pathState == 21) {
@@ -108,7 +118,7 @@ public class Auto extends RobotBase {
         } else if (pathState == 23) {
             if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(31);
         }
-//        //to 3 roll
+        //to 3 roll
         else if (pathState == 31) {
             if (!follower.isBusy()) {
                 intake.on();
@@ -127,6 +137,10 @@ public class Auto extends RobotBase {
 
         } else if (pathState == 33) {
             if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(34);
+        } else {
+            intake.off();
+            colorSpinner.on(0);
+            shooter.shooterPower(0);
         }
     }
 
@@ -140,11 +154,11 @@ public class Auto extends RobotBase {
         follower.update();
         autonomousPathUpdate();
         //vision
-        if (pathState == 12 && follower.getPose().getX() < -30) shooter.visionTracking(1);
-        else shooter.visionTracking(2);
+        shooter.visionTracking(2);
+        shooter.pitchDegree(43);
         // These loop the movements of the robot
 
-        telemetry.addData("uVelocity", shooter.limelight.getLatestResult().getTx());
+        telemetry.addData("getTx", shooter.limelight.getLatestResult().getTx());
         telemetry.addData("uVelocity", shooter.uVelocity);
         telemetry.addData("dVelocity", shooter.dVelocity);
         telemetry.addData("dVelocity", shooter.shooterVelocity);

@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
+
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
+
 import androidx.core.content.pm.PermissionInfoCompat;
+
 import com.bylazar.configurables.annotations.Configurable;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -13,25 +15,13 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import java.util.function.Supplier;
 
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionProcessor;
-import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 
@@ -66,7 +56,6 @@ public abstract class RobotBase extends OpMode {
         intake = new Intake(hardwareMap, telemetry);
         shooter = new Shooter(hardwareMap, telemetry);
 
-
         telemetry.addData("init", "done");
         telemetry.update();
     }
@@ -92,7 +81,6 @@ public abstract class RobotBase extends OpMode {
         shooter.limelight.stop(); // 停止 Limelight
     }
 
-    //
     protected abstract void robotInit();
 
     protected abstract void robotInitLoop();
