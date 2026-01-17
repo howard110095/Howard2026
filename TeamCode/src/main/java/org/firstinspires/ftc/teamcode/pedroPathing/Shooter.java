@@ -71,7 +71,6 @@ public class Shooter {
         double targetDegree;
         if (dy(pipe) < 0) targetDegree = (dx(pipe) >= 0) ? 0 : 180;   // 右上→0，左上→180
         else targetDegree = Math.toDegrees(Math.atan2(dy(pipe), dx(pipe)));
-
         double heading = Math.toDegrees(follower.getPose().getHeading());
         double degree = ((targetDegree - heading + 540) % 360) - 180;
         degree = clamp(degree, -90, 90);
@@ -127,10 +126,9 @@ public class Shooter {
             double y = limelight.getLatestResult().getTy();
             if (y > -16.5) shooterVelocity = 4.5894 * Math.pow(y, 2) - 3.1401 * y + 2506.5;
             else shooterVelocity = 4100;
-        } else {
-            double dx = dx(pipe), dy = dy(pipe);
-            shooterVelocity = 4100;
         }
+//            double dx = dx(pipe), dy = dy(pipe);
+//            shooterVelocity = 4100;
         //set power
         uVelocity = shooterU.getVelocity() / 28.0 * 60.0;
         dVelocity = shooterD.getVelocity() / 28.0 * 60.0;

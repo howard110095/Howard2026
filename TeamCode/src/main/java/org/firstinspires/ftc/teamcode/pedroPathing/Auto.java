@@ -20,7 +20,6 @@ public class Auto extends RobotBase {
     private int pathState;
     private Path park;
     private PathChain path0, path1_go, path1_back, path2, path3;
-
     public static boolean spinDETECT = false;
 
     public void buildPaths() {
@@ -51,7 +50,6 @@ public class Auto extends RobotBase {
                 .addPath(new BezierCurve(blueRoll3, blueControl3, shootingBluePose))
                 .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
                 .build();
-
     }
 
     public void autonomousPathUpdate() {
@@ -84,75 +82,100 @@ public class Auto extends RobotBase {
                 setPathState(13);
             }
         } else if (pathState == 13) {
-            if (pathTimer.getElapsedTimeSeconds() > 2) setPathState(14);
+            if (pathTimer.getElapsedTimeSeconds() > 1.7) setPathState(14);
         } else if (pathState == 14) {
             intake.on();
             follower.followPath(path1_back, true);
-            setPathState(151);
-        } else if (pathState == 151) {
+            setPathState(15);
+        } else if (pathState == 15) {
             if (follower.getPose().getX() > -40) {
                 spinDETECT = true;
-                setPathState(15);
-            }
-        } else if (pathState == 15) {
-            if (!follower.isBusy()) {
-                intake.off();
                 setPathState(16);
             }
         } else if (pathState == 16) {
-            if (pathTimer.getElapsedTimeSeconds() >= 3) setPathState(-1);
+            if (!follower.isBusy()) {
+                intake.off();
+                setPathState(17);
+            }
         } else if (pathState == 17) {
-            spinDETECT = false;
+            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(18);
+        } else if (pathState == 18) {
             intake.off();
+            spinDETECT = false;
+            colorSpinner.logic(AprilTagNumber);
+            if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(19);
+        } else if (pathState == 19) {
             colorSpinner.on(1);
             shooter.setVelocity(AutoVelocity, true);
-            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(-1);
+            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(21);
         }
         //to 2 roll
         else if (pathState == 21) {
             if (!follower.isBusy()) {
                 intake.on();
-                shooter.shooting(2, false);
+                shooter.setVelocity(AutoVelocity, false);
                 colorSpinner.on(0.18);
                 follower.followPath(path2, true);
+                colorSpinner.colorRenew();
                 setPathState(22);
             }
         } else if (pathState == 22) {
+            if (follower.getPose().getX() < -53) setPathState(23);
+        } else if (pathState == 23) {
+            if (follower.getPose().getX() > -50) {
+                spinDETECT = true;
+                setPathState(24);
+            }
+        } else if (pathState == 24) {
             if (!follower.isBusy()) {
                 intake.off();
-                colorSpinner.on(0.4);
-                shooter.shooting(2, true);
-                setPathState(23);
+                setPathState(26);
             }
-
-        } else if (pathState == 23) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(31);
+        } else if (pathState == 26) {
+            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(27);
+        } else if (pathState == 27) {
+            intake.off();
+            spinDETECT = false;
+            colorSpinner.logic(AprilTagNumber);
+            if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(28);
+        } else if (pathState == 28) {
+            colorSpinner.on(1);
+            shooter.setVelocity(AutoVelocity, true);
+            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(-1);
         }
         //to 3 roll
         else if (pathState == 31) {
             if (!follower.isBusy()) {
                 intake.on();
-                shooter.shooting(2, false);
+                shooter.setVelocity(AutoVelocity, false);
                 colorSpinner.on(0.18);
-                follower.followPath(path3, true);
+                follower.followPath(path2, true);
+                colorSpinner.colorRenew();
                 setPathState(32);
             }
         } else if (pathState == 32) {
+            if (follower.getPose().getX() < -53) setPathState(33);
+        } else if (pathState == 33) {
+            if (follower.getPose().getX() > -50) {
+                spinDETECT = true;
+                setPathState(34);
+            }
+        } else if (pathState == 34) {
             if (!follower.isBusy()) {
                 intake.off();
-                colorSpinner.on(0.4);
-                shooter.shooting(2, true);
-                setPathState(33);
+                setPathState(36);
             }
-
-        } else if (pathState == 33) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(34);
-        } else {
-            spinDETECT = false;
-            shooter.elevatorOff();
+        } else if (pathState == 36) {
+            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(37);
+        } else if (pathState == 37) {
             intake.off();
-            colorSpinner.on(0);
-            shooter.shooterPower(0);
+            spinDETECT = false;
+            colorSpinner.logic(AprilTagNumber);
+            if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(38);
+        } else if (pathState == 38) {
+            colorSpinner.on(1);
+            shooter.setVelocity(AutoVelocity, true);
+            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(-1);
         }
     }
 
@@ -168,7 +191,13 @@ public class Auto extends RobotBase {
         //vision
 //        shooter.visionTracking(2);
         shooter.pitchDegree(43);
-        shooter.visionTracking(2);
+        if (pathState == 12 && follower.getPose().getX() > -35) {
+            LLResult result = shooter.limelight.getLatestResult();
+            if (result != null && result.isValid()) {
+
+            }
+        }
+        else shooter.visionTracking(2);
         // These loop the movements of the robot
 
         if (spinDETECT) {

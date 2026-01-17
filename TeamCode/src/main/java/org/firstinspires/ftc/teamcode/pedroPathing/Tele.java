@@ -11,6 +11,8 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 @TeleOp(name = "Tele", group = "Linear OpMode")
 public class Tele extends RobotBase {
     public static double test1 = 36, test2 = 3800, test3 = 30;
+    int temp = 1;
+    boolean last = false;
 
     @Override
     public void robotInit() {
@@ -28,36 +30,33 @@ public class Tele extends RobotBase {
 
     @Override
     public void robotLoop() {
-        if (gamepad1.dpad_up) test1 = 1;
-        else if (gamepad1.dpad_left) test1 = 2;
-        else if (gamepad1.dpad_right) test1 = 0;
-        shooter.visionTracking((int) test1);
+        //teleop
+        if (gamepad1.left_trigger > 0.3) {
+            temp = 1;
+            intake.out();
+            colorSpinner.on(-1);
+        } else {
+            //shooting
+            shooter.shooting(2, gamepad1.right_bumper);
+            //spinner
+            if (gamepad1.right_bumper) colorSpinner.spin.setPower(1);
+            else colorSpinner.spin.setPower(0.18);
+            //intake state
+            if (!last && gamepad1.left_bumper) temp++;
+            last = gamepad1.left_bumper;
+        }
+        shooter.visionTracking(2);
 
-        if (gamepad1.y) test3 += 0.5;
-        else if (gamepad1.a) test3 -= 0.5;
-
-        //shooting
-        shooter.shooting((int) test1, gamepad1.right_bumper);
-        //spinner
-        if (gamepad1.right_bumper) colorSpinner.spin.setPower(1);
-        else colorSpinner.spin.setPower(0.18);
-        //intake
-        if (gamepad1.left_bumper) intake.on();
-        else if (gamepad1.left_trigger > 0.5) intake.out();
-        else intake.off();
-
-        test3 = clamp(test3, 24, 49);
-        shooter.pitchDegree(test3);
+//
+//        test3 = clamp(test3, 24, 49);
+//        shooter.pitchDegree(test3);
 
 
 //        shooter.pitchDegree(test1);
 //        shooter.setVelocity(test2, true);
 //        intake.on();
 //        colorSpinner.on(1);
-//
 //        shooter.setVelocity(test2, true);
-
-
 //        shooter.visionTracking((int)test1);
         // 底盤遙控
         double axial = -gamepad1.left_stick_y;

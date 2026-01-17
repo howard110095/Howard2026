@@ -63,8 +63,8 @@ public class ColorSpinner {
         if (place == 3 && Math.abs(getDegree() - Place3) < 30) detect = true;
         if (detect) {
             if (color1.blue() + color1.green() > 1000) {
-                if (color1.blue() > color1.green()) return 5;
-                else return 4;
+                if (color1.blue() > color1.green()) return 5;//purple
+                else return 4; //green
             } else if (color2.blue() + color2.green() > 1000) {
                 if (color2.blue() > color2.green()) return 5;
                 else return 4;
