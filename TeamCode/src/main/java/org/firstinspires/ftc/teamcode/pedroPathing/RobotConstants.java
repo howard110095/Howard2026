@@ -45,5 +45,5 @@ public class RobotConstants {
 
 
     public static Pose s0_0 = new Pose(0, 0, Math.toRadians(0));
-    public static Pose s0_1 = new Pose(0, 60, Math.toRadians(0));
+    public static Pose s0_1 = new Pose(0, 50, Math.toRadians(0));
 }
