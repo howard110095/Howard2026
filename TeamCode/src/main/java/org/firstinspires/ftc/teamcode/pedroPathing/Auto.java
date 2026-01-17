@@ -86,13 +86,15 @@ public class Auto extends RobotBase {
         } else if (pathState == 13) {
             if (pathTimer.getElapsedTimeSeconds() > 2) setPathState(14);
         } else if (pathState == 14) {
-            spinDETECT = true;
             intake.on();
             follower.followPath(path1_back, true);
-            setPathState(15);
-        }
-        //
-        else if (pathState == 15) {
+            setPathState(151);
+        } else if (pathState == 151) {
+            if (follower.getPose().getX() > -40) {
+                spinDETECT = true;
+                setPathState(15);
+            }
+        } else if (pathState == 15) {
             if (!follower.isBusy()) {
                 intake.off();
                 setPathState(16);

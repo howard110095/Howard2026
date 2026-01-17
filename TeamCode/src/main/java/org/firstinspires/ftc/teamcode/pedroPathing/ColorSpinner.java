@@ -23,7 +23,7 @@ public class ColorSpinner {
     private PIDController ColorSpinnerPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
 
     public int place1 = 0, place2 = 0, place3 = 0; //none 0  green 4  purple 5
-    public double Place1 = 305, Place2 = 185, Place3 = 65;
+    public double Place1 = 305, Place2 = 185, Place3 = 65; //angle
 
     public ColorSpinner(HardwareMap hardwareMap, Telemetry telemetry) {
         color1 = hardwareMap.get(ColorSensor.class, "color1");
@@ -72,7 +72,6 @@ public class ColorSpinner {
         } else return 0;
     }
 
-
     public void detect3pose() {
         if (detectColor(1) != 0 || place1 != 0) {
             if (place1 == 0) place1 = detectColor(1);
@@ -84,6 +83,35 @@ public class ColorSpinner {
                 } else turnToAngle(Place3);
             } else turnToAngle(Place2);
         } else turnToAngle(Place1);
+    }
+
+    public void logic(int input) {
+        if (place1 + place2 + place3 != 14) {
+            if (place1 + place2 + place3 == 9 || place1 + place2 + place3 == 10) {
+                if (place1 == 0) place1 = 14 - place2 - place3;
+                else if (place2 == 0) place2 = 14 - place1 - place3;
+                else place3 = 14 - place1 - place2;
+            } else {
+                place1 = 5;
+                place2 = 4;
+                place3 = 5;
+            }
+        }
+        if (input == 21) {
+            if (place1 == 4) turnToAngle(Place1);
+            else if (place2 == 4) turnToAngle(Place2);
+            else turnToAngle(Place3);
+        }
+        else if(input == 22) {
+            if (place1 == 4) turnToAngle(Place3);
+            else if (place2 == 4) turnToAngle(Place1);
+            else turnToAngle(Place2);
+        }
+        else{
+            if (place1 == 4) turnToAngle(Place2);
+            else if (place2 == 4) turnToAngle(Place3);
+            else turnToAngle(Place1);
+        }
     }
 
     public void turnToAngle(double targetAngle) {
