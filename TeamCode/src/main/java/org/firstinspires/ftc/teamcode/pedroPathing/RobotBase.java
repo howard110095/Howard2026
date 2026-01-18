@@ -32,7 +32,7 @@ public abstract class RobotBase extends OpMode {
     public static Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
     private Supplier<PathChain> pathChain;
-    private TelemetryManager telemetryM;
+    public TelemetryManager telemetryM;
 
     protected ColorSpinner colorSpinner;  // 這樣 Tele/Auto 都可以使用;
     protected Shooter shooter;  // 這樣 Tele/Auto 都可以使用

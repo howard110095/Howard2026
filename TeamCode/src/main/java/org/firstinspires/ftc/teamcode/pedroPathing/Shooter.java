@@ -27,10 +27,11 @@ public class Shooter {
     public AnalogInput aimAnalogInput;
     public Limelight3A limelight;
     private PIDController SpinnerPID = new PIDController(0.02, 0, 0.02);
-    private PIDController ShooterUPID = new PIDController(0, 0, 0);
-    private PIDController ShooterDPID = new PIDController(0, 0, 0);
+    public PIDController ShooterUPID = new PIDController(0, 0, 0);
+    public PIDController ShooterDPID = new PIDController(0, 0, 0);
     public static boolean controlShooting = false;
-    public static double ukP = 0.015, ukI = 0.0015, ukD = 0, dkP = 0.015, dkI = 0.0015, dkD = 0;
+    public static double ukP = 3.2, ukI = 0.13, ukD = 0.003;
+    public static double dkP = 3.2, dkI = 0.13, dkD = 0.003;
     public static double spinP = 0.01;
     public double shooterVelocity = 2000, uVelocity, dVelocity, shooterU_power, shooterD_power;
 
@@ -102,19 +103,22 @@ public class Shooter {
     }
 
     public void setVelocity(double velocity, boolean on) {
-        velocity = clamp(velocity, 3000, 4500);
-        uVelocity = shooterU.getVelocity() / 28.0 * 60.0;
-        dVelocity = shooterD.getVelocity() / 28.0 * 60.0;
-        ShooterUPID.setPID(ukP, ukI, 0); // 設置 PID
-        shooterU_power = ShooterUPID.calculate(uVelocity, velocity); // 計算輸出
-        ShooterDPID.setPID(dkP, dkI, 0); // 設置 PID
-        shooterD_power = ShooterDPID.calculate(dVelocity, velocity); // 計算輸出
-        shooterU_power = clamp(shooterU_power, 0, 1);
-        shooterD_power = clamp(shooterD_power, 0, 1);
+//        velocity = clamp(velocity, 3000, 4500);
+//        velocity /= 6000;
+        double velocity1 = velocity / 4600;
+        double velocity2 = velocity / 4300;
+        uVelocity = ((shooterU.getVelocity() / 28) * 60) / 4600;
+        dVelocity = ((shooterD.getVelocity() / 28) * 60) / 4300;
+        ShooterUPID.setPID(ukP, ukI, ukD); // 設置 PID
+        shooterU_power = ShooterUPID.calculate(uVelocity, velocity1); // 計算輸出
+        ShooterDPID.setPID(dkP, dkI, dkD); // 設置 PID
+        shooterD_power = ShooterDPID.calculate(dVelocity, velocity2); // 計算輸出
+        shooterU_power = clamp(shooterU_power + velocity1, -1, 1.0);
+        shooterD_power = clamp(shooterD_power + velocity2, -1, 1.0);
         shooterU.setPower(shooterU_power);
         shooterD.setPower(shooterD_power);
         if (controlShooting && on) elevatorUp();
-        else if (on && velocity - 500 < uVelocity && velocity - 500 < dVelocity)
+        else if (on && Math.abs(uVelocity - velocity1) < 0.03 && Math.abs(dVelocity - velocity2) < 0.03) //正規後的範圍
             controlShooting = true;
         else {
             elevatorOff();

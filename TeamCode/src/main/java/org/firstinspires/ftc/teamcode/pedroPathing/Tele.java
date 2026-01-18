@@ -12,9 +12,11 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 @Configurable
 @TeleOp(name = "Tele", group = "Linear OpMode")
 public class Tele extends RobotBase {
-    public static double test1 = 36, test2 = 3800, test3 = 30;
+    public static double targetVelocity = 3800, test2 = 3800, test3 = 30;
     int temp = 1;
     boolean last = false;
+
+//    public static double velocityU,
 
     @Override
     public void robotInit() {
@@ -32,6 +34,9 @@ public class Tele extends RobotBase {
 
     @Override
     public void robotLoop() {
+//        intake.on();
+//        colorSpinner.on(1);
+        shooter.setVelocity(targetVelocity, true);
 //        //teleop
 //        if (gamepad1.left_trigger > 0.3) {
 //            temp = 1;
@@ -48,7 +53,7 @@ public class Tele extends RobotBase {
 //            last = gamepad1.left_bumper;
 //        }
 //        shooter.visionTracking(2);
-        colorSpinner.detect3posePRO();
+//        colorSpinner.detect3posePRO();
 //
 //        test3 = clamp(test3, 24, 49);
 //        shooter.pitchDegree(test3);
@@ -68,24 +73,33 @@ public class Tele extends RobotBase {
         follower.setTeleOpDrive(axial, lateral, -yaw * 0.8, true);
 
         // 顯示數據
-        telemetry.addData("3 blue", colorSpinner.color3.blue());
-        telemetry.addData("3 green", colorSpinner.color3.green());
-        telemetry.addData("4 blue", colorSpinner.color4.blue());
-        telemetry.addData("4 green", colorSpinner.color4.green());
-        telemetry.addData("5 blue", colorSpinner.color5.blue());
-        telemetry.addData("5 green", colorSpinner.color5.green());
-        telemetry.addData("6 blue", colorSpinner.color6.blue());
-        telemetry.addData("6 green", colorSpinner.color6.green());
-        telemetry.addData("tagNumber", shooter.tagNumber());
-        telemetry.addData("getLatestResult", shooter.limelight.getLatestResult().getTx());
+        telemetryM.addData("target velocity", targetVelocity);
+        telemetryM.addData("up velocity", shooter.shooterU.getVelocity() / 28.0 * 60.0);
+        telemetryM.addData("down velocity", shooter.shooterD.getVelocity() / 28.0 * 60.0);
+        telemetryM.update();
+
+//        telemetry.addData("3 blue", colorSpinner.color3.blue());
+//        telemetry.addData("3 green", colorSpinner.color3.green());
+//        telemetry.addData("4 blue", colorSpinner.color4.blue());
+//        telemetry.addData("4 green", colorSpinner.color4.green());
+//        telemetry.addData("5 blue", colorSpinner.color5.blue());
+//        telemetry.addData("5 green", colorSpinner.color5.green());
+//        telemetry.addData("6 blue", colorSpinner.color6.blue());
+//        telemetry.addData("6 green", colorSpinner.color6.green());
+//        telemetry.addData("tagNumber", shooter.tagNumber());
+//        telemetry.addData("getLatestResult", shooter.limelight.getLatestResult().getTx());
+        telemetry.addData("pid up calculate",shooter.ShooterUPID.calculate(shooter.shooterU.getVelocity() / 2800, targetVelocity / 4600));
+        telemetry.addData("pid down calculate",shooter.ShooterDPID.calculate(shooter.shooterD.getVelocity() / 2800, targetVelocity / 4300));
         telemetry.addData("shooterU.getPower", shooter.shooterU.getPower());
         telemetry.addData("shooterD.getPower", shooter.shooterD.getPower());
-        telemetry.addData("1", colorSpinner.place1);
-        telemetry.addData("2", colorSpinner.place2);
-        telemetry.addData("3", colorSpinner.place3);
-        telemetry.addData("shooter.getPose()", shooter.getPose());
-        telemetry.addData("uVelocity", shooter.shooterU.getVelocity() / 28.0 * 60.0);
-        telemetry.addData("dVelocity", shooter.shooterD.getVelocity() / 28.0 * 60.0);
+//        telemetry.addData("1", colorSpinner.place1);
+//        telemetry.addData("2", colorSpinner.place2);
+//        telemetry.addData("3", colorSpinner.place3);
+//        telemetry.addData("shooter.getPose()", shooter.getPose());
+        telemetry.addData("Up Velocity ", shooter.uVelocity);
+        telemetry.addData("Down Velocity ", shooter.dVelocity);
+        telemetry.addData("Up Velocity rpm", shooter.shooterU.getVelocity() / 28.0 * 60.0);
+        telemetry.addData("Down Velocity rpm", shooter.shooterD.getVelocity() / 28.0 * 60.0);
 //        telemetry.addData("shooterU.getVelocity()", shooter.shooterU.getVelocity());
 //        telemetry.addData("shooterD.getVelocity()", shooter.shooterD.getVelocity());
 //        telemetry.addData("delta", colorSpinner.delta);

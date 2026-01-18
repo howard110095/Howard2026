@@ -22,15 +22,15 @@ public class AutoTest extends RobotBase {
     private PathChain path0, path00;
 
     public void buildPaths() {
-        path0 = follower.pathBuilder()
-                .addPath(new BezierLine(s0_0, s0_1))
-                .setLinearHeadingInterpolation(s0_0.getHeading(), s0_1.getHeading())
-                .build();
-
-        path00 = follower.pathBuilder()
-                .addPath(new BezierLine(follower.getPose(), s0_0))
-                .setLinearHeadingInterpolation(follower.getPose().getHeading(), s0_0.getHeading())
-                .build();
+//        path0 = follower.pathBuilder()
+//                .addPath(new BezierLine(s0_0, s0_1))
+//                .setLinearHeadingInterpolation(s0_0.getHeading(), s0_1.getHeading())
+//                .build();
+//
+//        path00 = follower.pathBuilder()
+//                .addPath(new BezierLine(follower.getPose(), s0_0))
+//                .setLinearHeadingInterpolation(follower.getPose().getHeading(), s0_0.getHeading())
+//                .build();
 
 
     }
@@ -87,7 +87,7 @@ public class AutoTest extends RobotBase {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 //        startingPose = startBluePose;
-        follower.setStartingPose(s0_0);
+//        follower.setStartingPose(s0_0);
         buildPaths();
     }
 
