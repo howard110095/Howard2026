@@ -24,14 +24,15 @@ public class Auto extends RobotBase {
 
     public void buildPaths() {
         path0 = follower.pathBuilder()
-                .addPath(new BezierLine(startBluePose, shootingBluePose))
-                .setLinearHeadingInterpolation(startBluePose.getHeading(), shootingBluePose.getHeading())
+                .addPath(new BezierLine(startBluePose, shootingBlueSeePose))
+                .setLinearHeadingInterpolation(startBluePose.getHeading(), shootingBlueSeePose.getHeading())
                 .build();
 
         path1_go = follower.pathBuilder()
-                .addPath(new BezierLine(shootingBluePose, blueRoll1))
-                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll1.getHeading())
+                .addPath(new BezierLine(shootingBlueSeePose, blueRoll1))
+                .setLinearHeadingInterpolation(shootingBlueSeePose.getHeading(), blueRoll1.getHeading())
                 .build();
+
         path1_back = follower.pathBuilder()
                 .addPath(new BezierLine(blueRoll1, shootingBluePose))
                 .setLinearHeadingInterpolation(blueRoll1.getHeading(), shootingBluePose.getHeading())
@@ -47,14 +48,17 @@ public class Auto extends RobotBase {
         path3 = follower.pathBuilder()
                 .addPath(new BezierCurve(shootingBluePose, blueControl3, blueRoll3))
                 .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll3.getHeading())
-                .addPath(new BezierCurve(blueRoll3, blueControl3, shootingBluePose))
+//                .addPath(new BezierCurve(blueRoll3, blueControl3, shootingBluePose))
+//                .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
+                .addPath(new BezierLine(blueRoll3, shootingBluePose))
                 .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
                 .build();
     }
 
     public void autonomousPathUpdate() {
         if (pathState == 0) {
-            intake.off();
+//            intake.off();
+            shooter.toDegree(-55);
             shooter.setVelocity(AutoVelocity, false);
             follower.followPath(path0, true);
             setPathState(1);
@@ -70,7 +74,7 @@ public class Auto extends RobotBase {
         //to 1 roll
         else if (pathState == 11) {
             if (!follower.isBusy()) {
-                intake.on();
+//                intake.on();
                 shooter.setVelocity(AutoVelocity, false);
                 colorSpinner.on(0.18);
                 follower.followPath(path1_go, true);
@@ -84,7 +88,9 @@ public class Auto extends RobotBase {
         } else if (pathState == 13) {
             if (pathTimer.getElapsedTimeSeconds() > 1.7) setPathState(14);
         } else if (pathState == 14) {
-            intake.on();
+            shooter.toDegree(-60);
+            if (AprilTagNumber == 0) AprilTagNumber = 21;
+//            intake.on();
             follower.followPath(path1_back, true);
             setPathState(15);
         } else if (pathState == 15) {
@@ -94,13 +100,13 @@ public class Auto extends RobotBase {
             }
         } else if (pathState == 16) {
             if (!follower.isBusy()) {
-                intake.off();
+//                intake.off();
                 setPathState(17);
             }
         } else if (pathState == 17) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(18);
+            if (pathTimer.getElapsedTimeSeconds() >= 0.1) setPathState(18);
         } else if (pathState == 18) {
-            intake.off();
+//            intake.off();
             spinDETECT = false;
             colorSpinner.logic(AprilTagNumber);
             if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(19);
@@ -112,7 +118,7 @@ public class Auto extends RobotBase {
         //to 2 roll
         else if (pathState == 21) {
             if (!follower.isBusy()) {
-                intake.on();
+//                intake.on();
                 shooter.setVelocity(AutoVelocity, false);
                 colorSpinner.on(0.18);
                 follower.followPath(path2, true);
@@ -128,28 +134,28 @@ public class Auto extends RobotBase {
             }
         } else if (pathState == 24) {
             if (!follower.isBusy()) {
-                intake.off();
+//                intake.off();
                 setPathState(26);
             }
         } else if (pathState == 26) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(27);
+            if (pathTimer.getElapsedTimeSeconds() >= 0.1) setPathState(27);
         } else if (pathState == 27) {
-            intake.off();
+//            intake.off();
             spinDETECT = false;
             colorSpinner.logic(AprilTagNumber);
             if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(28);
         } else if (pathState == 28) {
             colorSpinner.on(1);
             shooter.setVelocity(AutoVelocity, true);
-            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(-1);
+            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(31);
         }
         //to 3 roll
         else if (pathState == 31) {
             if (!follower.isBusy()) {
-                intake.on();
+//                intake.on();
                 shooter.setVelocity(AutoVelocity, false);
                 colorSpinner.on(0.18);
-                follower.followPath(path2, true);
+                follower.followPath(path3, true);
                 colorSpinner.colorRenew();
                 setPathState(32);
             }
@@ -162,13 +168,13 @@ public class Auto extends RobotBase {
             }
         } else if (pathState == 34) {
             if (!follower.isBusy()) {
-                intake.off();
+//                intake.off();
                 setPathState(36);
             }
         } else if (pathState == 36) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(37);
+            if (pathTimer.getElapsedTimeSeconds() >= 0.1) setPathState(37);
         } else if (pathState == 37) {
-            intake.off();
+//            intake.off();
             spinDETECT = false;
             colorSpinner.logic(AprilTagNumber);
             if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(38);
@@ -189,21 +195,24 @@ public class Auto extends RobotBase {
         follower.update();
         autonomousPathUpdate();
         //vision
-//        shooter.visionTracking(2);
+        intake.on();
         shooter.pitchDegree(43);
-        if (pathState == 12 && follower.getPose().getX() > -35) {
-            LLResult result = shooter.limelight.getLatestResult();
-            if (result != null && result.isValid()) {
-
-            }
-        }
-        else shooter.visionTracking(2);
+        if (pathState <= 11) shooter.toDegree(-55);
+        else if ((pathState == 12 || pathState == 13) && AprilTagNumber == 0) {
+//            shooter.visionTracking(1);
+            shooter.toDegree(-90);
+            AprilTagNumber = shooter.tagNumber();
+        } else if (pathState >= 14) shooter.toDegree(-60);
+//        else shooter.visionTracking(2);
+//        else shooter.toDegree(-55);
         // These loop the movements of the robot
 
         if (spinDETECT) {
-            colorSpinner.detect3pose();
+            colorSpinner.detect3posePRO();
         }
 
+
+        telemetry.addData("number", AprilTagNumber);
         telemetry.addData("1", colorSpinner.place1);
         telemetry.addData("2", colorSpinner.place2);
         telemetry.addData("3", colorSpinner.place3);

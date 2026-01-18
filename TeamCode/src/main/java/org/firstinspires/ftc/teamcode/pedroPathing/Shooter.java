@@ -8,6 +8,7 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import java.util.List;
 
 @Configurable
 public class Shooter {
@@ -28,7 +31,7 @@ public class Shooter {
     private PIDController ShooterDPID = new PIDController(0, 0, 0);
     public static boolean controlShooting = false;
     public static double ukP = 0.015, ukI = 0.0015, ukD = 0, dkP = 0.015, dkI = 0.0015, dkD = 0;
-    public static double spinP = 0.007;
+    public static double spinP = 0.01;
     public double shooterVelocity = 2000, uVelocity, dVelocity, shooterU_power, shooterD_power;
 
     public Shooter(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -143,6 +146,16 @@ public class Shooter {
         if (on && shooterVelocity - 350 < uVelocity && shooterVelocity - 350 < dVelocity)
             elevatorUp();
         else elevatorOff();
+    }
+
+    public int tagNumber() {
+        limelight.pipelineSwitch(1);
+        LLResult result = limelight.getLatestResult();
+        List<LLResultTypes.FiducialResult> tags = result.getFiducialResults();
+        for (LLResultTypes.FiducialResult tag : result.getFiducialResults()) {
+            return tag.getFiducialId();
+        }
+        return 0;
     }
 
     public void shooterPower(double power) {

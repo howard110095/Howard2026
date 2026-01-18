@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 @Configurable
 public class ColorSpinner {
     public double delta;
-    public ColorSensor color1, color2;
+    public ColorSensor color1, color2, color3, color4, color5, color6;
     public CRServo spin;
     public AnalogInput spinAnalogInput;
     private PIDController ColorSpinnerPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
@@ -28,6 +28,10 @@ public class ColorSpinner {
     public ColorSpinner(HardwareMap hardwareMap, Telemetry telemetry) {
         color1 = hardwareMap.get(ColorSensor.class, "color1");
         color2 = hardwareMap.get(ColorSensor.class, "color2");
+        color3 = hardwareMap.get(ColorSensor.class, "color3");
+        color4 = hardwareMap.get(ColorSensor.class, "color4");
+        color5 = hardwareMap.get(ColorSensor.class, "color5");
+        color6 = hardwareMap.get(ColorSensor.class, "color6");
         spin = hardwareMap.get(CRServo.class, "spin");
         spinAnalogInput = hardwareMap.get(AnalogInput.class, "spinAnalogInput");
         spin.setDirection(CRServo.Direction.REVERSE);
@@ -85,6 +89,36 @@ public class ColorSpinner {
         } else turnToAngle(Place1);
     }
 
+    public void detect3posePRO() {
+        turnToAngle(Place1);
+        if (Math.abs(getDegree() - Place1) < 30) {
+            //place 1
+            if (color1.blue() + color1.green() > 1000) {
+                if (color1.blue() > color1.green()) place1 = 5;//purple
+                else place1 = 4; //green
+            } else if (color2.blue() + color2.green() > 1000) {
+                if (color2.blue() > color2.green()) place1 = 5;
+                else place1 = 4;
+            } else place1 = 0;
+            //place 2
+            if (color3.blue() + color3.green() > 1000) {
+                if (color3.blue() > color3.green()) place2 = 5;//purple
+                else place2 = 4; //green
+            } else if (color4.blue() + color4.green() > 1000) {
+                if (color4.blue() > color4.green()) place2 = 5;
+                else place2 = 4;
+            } else place2 = 0;
+            //place 3
+            if (color5.blue() + color5.green() > 1000) {
+                if (color5.blue() > color5.green()) place3 = 5;//purple
+                else place3 = 4; //green
+            } else if (color6.blue() + color6.green() > 1000) {
+                if (color6.blue() > color6.green()) place3 = 5;
+                else place3 = 4;
+            } else place3 = 0;
+        }
+    }
+
     public void logic(int input) {
         if (place1 + place2 + place3 != 14) {
             if (place1 + place2 + place3 == 9 || place1 + place2 + place3 == 10) {
@@ -101,13 +135,11 @@ public class ColorSpinner {
             if (place1 == 4) turnToAngle(Place1);
             else if (place2 == 4) turnToAngle(Place2);
             else turnToAngle(Place3);
-        }
-        else if(input == 22) {
+        } else if (input == 22) {
             if (place1 == 4) turnToAngle(Place3);
             else if (place2 == 4) turnToAngle(Place1);
             else turnToAngle(Place2);
-        }
-        else{
+        } else {
             if (place1 == 4) turnToAngle(Place2);
             else if (place2 == 4) turnToAngle(Place3);
             else turnToAngle(Place1);
