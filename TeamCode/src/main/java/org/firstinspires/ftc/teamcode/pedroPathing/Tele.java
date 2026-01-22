@@ -86,7 +86,10 @@ public abstract class Tele extends RobotBase {
         follower.update();
         follower.setTeleOpDrive(axial, lateral, -yaw * 0.8, true);
 
-//        telemetry.addData("delta", ddd);
+        telemetry.addData("ty", shooter.limelight.getLatestResult().getTy());
+        telemetry.addData("distance pinpoint", shooter.distance(0));
+        telemetry.addData("distance vision", shooter.d);
+        telemetry.addData("toVelocity", toVelocity);
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", Math.toDegrees(follower.getHeading()));

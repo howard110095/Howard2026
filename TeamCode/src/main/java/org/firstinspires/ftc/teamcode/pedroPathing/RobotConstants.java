@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
 
+@Configurable
 public class RobotConstants {
     //mode
     public static boolean isAuto = false;
@@ -13,7 +15,8 @@ public class RobotConstants {
 
     public static double ukP = 3.2, ukI = 0.13, ukD = 0.003;
     public static double dkP = 3.2, dkI = 0.13, dkD = 0.003;
-    public static double spinP = 0.025;
+    public static double spinP = 0.018, spinI = 0.08, spinD = 0.0008;
+    public static double cameraP = 0.02, cameraI = 0.015, cameraD = 0.002;
 
     //Auto
     public static double shootingTime = 2.5;

@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.Servo;
+
 import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 
 import java.util.List;
@@ -33,6 +34,9 @@ public class Shooter {
     public PIDController ShooterDPID = new PIDController(0, 0, 0);
     public static boolean controlShooting = false;
     public double shooterVelocity = 2000, uVelocity, dVelocity, shooterU_power, shooterD_power;
+//    public static double cameraP = 0.02, cameraI = 0.015, cameraD = 0.002;
+
+    public static double d;
 
     public Shooter(HardwareMap hardwareMap, Telemetry telemetry) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -60,20 +64,19 @@ public class Shooter {
     }
 
     public double dx(int pipe) {
-        if (pipe == 0) return 62.0 - follower.getPose().getX();
+        if (pipe == 0) return 66.0 - follower.getPose().getX();
         else if (pipe == 1) return 0.0 - follower.getPose().getX();
-        else return -62.0 - follower.getPose().getX();
+        else return -66.0 - follower.getPose().getX();
     }
 
     public double dy(int pipe) {
         if (pipe == 1) return 72.0 - follower.getPose().getY();
-        else return 62.0 - follower.getPose().getY();
+        else return 66.0 - follower.getPose().getY();
     }
 
     public double distance(int pipe) {
         return Math.pow(dx(pipe) * dx(pipe) + dy(pipe) * dy(pipe), 0.5);
     }
-
 
 
 //    public void setVelocity(double velocity, boolean on) {
@@ -108,8 +111,9 @@ public class Shooter {
 //            if (y > -16.5) shooterVelocity = 4.5894 * Math.pow(y, 2) - 3.1401 * y + 2506.5;
 //            else shooterVelocity = 4100;
 //        }
-////            double dx = dx(pipe), dy = dy(pipe);
-////            shooterVelocity = 4100;
+
+    /// /            double dx = dx(pipe), dy = dy(pipe);
+    /// /            shooterVelocity = 4100;
 //        //set power
 //        uVelocity = shooterU.getVelocity() / 28.0 * 60.0;
 //        dVelocity = shooterD.getVelocity() / 28.0 * 60.0;
@@ -125,7 +129,6 @@ public class Shooter {
 //            elevatorUp();
 //        else elevatorOff();
 //    }
-
     public void shootingPRO(int pipeline, double targetVelocity, double turretTargetYaw, double turretTargetPitch, boolean openShooting) {
         // setting pipe line
         limelight.pipelineSwitch(pipeline);
@@ -135,11 +138,11 @@ public class Shooter {
         toVelocity = targetVelocity;
         if (targetVelocity == 0) {  //tracking
             if (result != null && result.isValid()) { //have apriltag, velocity
-                double y = limelight.getLatestResult().getTy();
-                if (y > -16.5) toVelocity = 4.5894 * Math.pow(y, 2) - 3.1401 * y + 2506.5;
-                else toVelocity = 4100;
+                d = (29.5 - 14) / Math.tan(Math.toRadians(19.41 + limelight.getLatestResult().getTy()));
+                d += 20;
+                toVelocity = 11.144 * d + 2376.3;
             } else
-                toVelocity = 30.211 * distance(pipeline) - 297.24; // no apriltag, velocity formula
+                toVelocity = 11.144 * distance(pipeline) + 2376.3; // no apriltag, velocity formula
         }
         double velocity1 = toVelocity / 4600;
         double velocity2 = toVelocity / 4300;
@@ -157,14 +160,17 @@ public class Shooter {
         // turret target yaw degree
         toYawDegree = turretTargetYaw;
         if (turretTargetYaw == -500) {  //tracking
-            if (result != null && result.isValid()) {
+            if (result != null && result.isValid() && follower.getPose().getY() < 48) {
                 //tracking formula
+                if (Math.abs(result.getTx()) > 2) toYawDegree = getDegree() - result.getTx();
+                else toYawDegree = getDegree();
 //                double p = (Math.abs(result.getTx()) > 10) ? -spinP : -0.015;
 //                double outputPower = result.getTx() * p;
 //                if (getDegree() > 90) outputPower = clamp(outputPower, -1, 0);
 //                else if (getDegree() < -90) outputPower = clamp(outputPower, 0, 1);
 //                shooterSpinnerPower(result.getTx() * p);
                 toYawDegree = getDegree() - result.getTx();
+                SpinnerPID.setPID(cameraP, cameraI, cameraD);
             } else {
                 double targetDegree;
                 if (dy(pipeline) < 0)
@@ -172,19 +178,22 @@ public class Shooter {
                 else targetDegree = Math.toDegrees(Math.atan2(dy(pipeline), dx(pipeline)));
                 double heading = Math.toDegrees(follower.getPose().getHeading());
                 toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
+                SpinnerPID.setPID(spinP, spinI, spinD);
             }
+        } else {
+            SpinnerPID.setPID(spinP, spinI, spinD);
         }
         toDegree(toYawDegree);
 
         // turret target pitch degree
         toPitchDegree = turretTargetPitch;
         if (turretTargetPitch == 0)   //tracking
-            toPitchDegree = 0.2726 * distance(pipeline) + 18.63;
+            toPitchDegree = 0.3472 * distance(pipeline) + 12.679;
         pitchDegree(toPitchDegree);
 
         // shooting or not
         if (openShooting && isAuto) elevatorUp();
-        else if (openShooting && !isAuto && Math.abs(uVelocity - velocity1) < 0.03 && Math.abs(dVelocity - velocity1) < 0.03)
+        else if (openShooting && !isAuto && Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1)
             elevatorUp();
         else elevatorOff();
     }
@@ -229,7 +238,7 @@ public class Shooter {
 
     public void toDegree(double target) {
         target = clamp(target, -90, 90);
-        SpinnerPID.setPID(spinP, 0, 0);
+//        SpinnerPID.setPID(0.018, 0.08, 0.0008);
         double power = SpinnerPID.calculate(getDegree(), target);
         power = clamp(power, -0.2, 0.2);
         shooterSpinner1.setPower(power);
@@ -240,12 +249,14 @@ public class Shooter {
     //elevator
     public void elevatorUp() {
         elevator.setPower(1);
-        arm.setPosition(0.49);
+//        arm.setPosition(0.49);//white
+        arm.setPosition(0.24);//black
     }
 
     public void elevatorOff() {
         elevator.setPower(0);
-        arm.setPosition(0.7);
+//        arm.setPosition(0.7); white
+        arm.setPosition(0.5); //black
     }
 
     public void cleaning() {
