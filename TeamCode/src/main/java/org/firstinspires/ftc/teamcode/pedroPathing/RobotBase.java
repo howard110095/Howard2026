@@ -34,9 +34,10 @@ public abstract class RobotBase extends OpMode {
     private Supplier<PathChain> pathChain;
     public TelemetryManager telemetryM;
 
-    protected ColorSpinner colorSpinner;  // 這樣 Tele/Auto 都可以使用;
-    protected Shooter shooter;  // 這樣 Tele/Auto 都可以使用
-    protected Intake intake;  // 這樣 Tele/Auto 都可以使用
+    protected ColorSpinner colorSpinner;  //
+    protected Shooter shooter;  //
+    protected Intake intake;  //
+    protected Foot foot;
 
     Gamepad.RumbleEffect effect = new Gamepad.RumbleEffect.Builder()
             .addStep(1.0, 1.0, 1000) // 右馬達全速震動 1000 毫秒
@@ -55,6 +56,7 @@ public abstract class RobotBase extends OpMode {
         colorSpinner = new ColorSpinner(hardwareMap, telemetry);
         intake = new Intake(hardwareMap, telemetry);
         shooter = new Shooter(hardwareMap, telemetry);
+        foot = new Foot(hardwareMap, telemetry);
 
         telemetry.addData("init", "done");
         telemetry.update();

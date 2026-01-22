@@ -3,6 +3,19 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 import com.pedropathing.geometry.Pose;
 
 public class RobotConstants {
+    //mode
+    public static boolean isAuto = false;
+    // shooting pro constant
+    public static int setAprilTagMode = 0;
+    public static double toVelocity = 0, toYawDegree = -500, toPitchDegree = 0;
+    public static double setVelocity = 0, setYawDegree = -500, setPitchDegree = 0;
+    public static boolean setShooting = false;
+
+    public static double ukP = 3.2, ukI = 0.13, ukD = 0.003;
+    public static double dkP = 3.2, dkI = 0.13, dkD = 0.003;
+    public static double spinP = 0.025;
+
+    //Auto
     public static double shootingTime = 2.5;
     public static int AprilTagNumber = 0;
     public static double AutoVelocity = 3650, toReadyShootingTime = 0.5;
