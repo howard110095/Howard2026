@@ -21,7 +21,6 @@ public class ColorSpinner {
     public CRServo spin;
     public AnalogInput spinAnalogInput;
     private PIDController ColorSpinnerPID = new PIDController(0, 0, 0); // 手臂 PID 控制器
-
     public int place1 = 0, place2 = 0, place3 = 0; //none 0  green 4  purple 5
     public double Place1 = 305, Place2 = 185, Place3 = 65; //angle
 
@@ -47,9 +46,10 @@ public class ColorSpinner {
     }
 
     public double getDegree() {
-        double pose = getPose();
-        pose -= 226.5;
-        pose *= 360 / 350.4;
+        double pose = (getPose() - 226.5) * 360.0 / 350.4;
+//        = getPose();
+//        pose -= 226.5;
+//        pose *= 360 / 350.4;
         if (pose < 0) pose += 360;
         return pose;
     }
@@ -60,62 +60,23 @@ public class ColorSpinner {
         place3 = 0;
     }
 
-    public int detectColor(int place) {
-        boolean detect = false;
-        if (place == 1 && Math.abs(getDegree() - Place1) < 30) detect = true;
-        if (place == 2 && Math.abs(getDegree() - Place2) < 30) detect = true;
-        if (place == 3 && Math.abs(getDegree() - Place3) < 30) detect = true;
-        if (detect) {
-            if (color1.blue() + color1.green() > 1000) {
-                if (color1.blue() > color1.green()) return 5;//purple
-                else return 4; //green
-            } else if (color2.blue() + color2.green() > 1000) {
-                if (color2.blue() > color2.green()) return 5;
-                else return 4;
-            } else return 0;
-        } else return 0;
-    }
-
-    public void detect3pose() {
-        if (detectColor(1) != 0 || place1 != 0) {
-            if (place1 == 0) place1 = detectColor(1);
-            if (detectColor(2) != 0 || place2 != 0) {
-                if (place2 == 0) place2 = detectColor(2);
-                if (detectColor(3) != 0 || place3 != 0) {
-                    if (place3 == 0) place3 = detectColor(3);
-                    spin.setPower(0);
-                } else turnToAngle(Place3);
-            } else turnToAngle(Place2);
-        } else turnToAngle(Place1);
+    private int detectColor(ColorSensor s1, ColorSensor s2) {
+        if (s1.blue() + s1.green() > 1000)
+            return (s1.blue() > s1.green()) ? 5 : 4;
+        else if (s2.blue() + s2.green() > 1000)
+            return (s2.blue() > s2.green()) ? 5 : 4;
+        return 0;
     }
 
     public void detect3posePRO() {
         turnToAngle(Place1);
         if (Math.abs(getDegree() - Place1) < 30) {
             //place 1
-            if (color1.blue() + color1.green() > 1000) {
-                if (color1.blue() > color1.green()) place1 = 5;//purple
-                else place1 = 4; //green
-            } else if (color2.blue() + color2.green() > 1000) {
-                if (color2.blue() > color2.green()) place1 = 5;
-                else place1 = 4;
-            } else place1 = 0;
+            if (place1 == 0) place1 = detectColor(color1, color2);
             //place 2
-            if (color3.blue() + color3.green() > 1000) {
-                if (color3.blue() > color3.green()) place2 = 5;//purple
-                else place2 = 4; //green
-            } else if (color4.blue() + color4.green() > 1000) {
-                if (color4.blue() > color4.green()) place2 = 5;
-                else place2 = 4;
-            } else place2 = 0;
+            if (place2 == 0) place2 = detectColor(color3, color4);
             //place 3
-            if (color5.blue() + color5.green() > 1000) {
-                if (color5.blue() > color5.green()) place3 = 5;//purple
-                else place3 = 4; //green
-            } else if (color6.blue() + color6.green() > 1000) {
-                if (color6.blue() > color6.green()) place3 = 5;
-                else place3 = 4;
-            } else place3 = 0;
+            if (place3 == 0) place3 = detectColor(color5, color6);
         }
     }
 
