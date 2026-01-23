@@ -23,6 +23,8 @@ public class RobotConstants {
     public static int AprilTagNumber = 0;
     public static double AutoVelocity = 3650, toReadyShootingTime = 0.5;
 
+
+
     //blue pose
     public static Pose shootingBlueSeePose = new Pose(-12, 12, Math.toRadians(180));
     public static Pose shootingBluePose = new Pose(-18, 12, Math.toRadians(180));

@@ -22,4 +22,7 @@ public class Intake {
     public void out() {
         intake.setPower(1);
     }
+    public void slowMode() {
+        intake.setPower(-0.4);
+    }
 }

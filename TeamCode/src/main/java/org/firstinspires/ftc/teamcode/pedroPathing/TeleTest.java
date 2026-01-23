@@ -4,24 +4,26 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @Configurable
 @TeleOp(name = "TeleTest", group = "Linear OpMode")
 public class TeleTest extends RobotBase {
-
-
-    public static double angle = 30, rpm = 2500;
+    public static double position = 0.5, rpm = 2500, setColor = 0;
 
 
     @Override
     public void robotInit() {
-
+        if (savedPose != null) startingPose = savedPose;
+        else startingPose = startBluePose; // 或 new Pose()
+        follower.setStartingPose(startingPose);
     }
 
     @Override
     protected void robotInitLoop() {
+        telemetry.addData("SavedPose", (savedPose != null) ? "YES" : "NO");
 //        shooter.cameraP = 0.02;
 //        shooter.cameraI = 0.015;
 //        shooter.cameraD = 0.002;
@@ -36,37 +38,14 @@ public class TeleTest extends RobotBase {
     public void robotLoop() {
 
 
-//        if (shooter.limelight.getLatestResult() != null && shooter.limelight.getLatestResult().isValid()) {
-//            toYawDegree = shooter.getDegree() - shooter.limelight.getLatestResult().getTx();
-//            t = toYawDegree;
-//            telemetry.addData("Auto", "Mode");
-//            telemetryM.addData("Auto", "Mode");
-//        } else {
-//        }
 
+        intake.slowMode();
+        colorSpinner.on(0.3);
+        shooter.elevator.setPower(1);
+        shooter.shooterU.setPower(0.5);
+        shooter.shooterD.setPower(0.5);
+        shooter.arm.setPosition(position);
 
-//        shooter.shooterD.setPower(1);
-//
-        setVelocity = rpm;
-        setPitchDegree = angle;
-        if (gamepad1.right_trigger > 0.3) { //shooting
-            setShooting = true;
-            colorSpinner.on(1);
-            intake.off();
-        } else if (gamepad1.left_bumper) {  //out ball
-            setShooting = false;
-            colorSpinner.on(-1);
-            intake.off();
-        } else if (gamepad1.left_trigger > 0.3) { //intake ball
-            setShooting = false;
-            colorSpinner.on(0.18);
-            intake.on();
-        } else {
-            setShooting = false;
-            colorSpinner.on(0.18);
-            intake.off();
-        }
-        shooter.shootingPRO(0, setVelocity, setYawDegree, setPitchDegree, setShooting);
 
         // drive
         double axial = -gamepad1.left_stick_y;
@@ -78,7 +57,9 @@ public class TeleTest extends RobotBase {
 
 //        telemetry.addData("target", t);
 //        telemetry.addData("get degree", shooter.getDegree());
-        telemetry.addData("ty", shooter.limelight.getLatestResult().getTy());
+        telemetry.addData("getPose", shooter.getPose());
+        telemetry.addData("getDegree", shooter.getDegree());
+//        telemetry.addData("ty", shooter.limelight.getLatestResult().getTy());
         telemetry.addData("distance", shooter.distance(0));
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
@@ -87,7 +68,7 @@ public class TeleTest extends RobotBase {
         telemetry.addData("down velocity ", shooter.shooterD.getVelocity() / 28 * 60);
         telemetry.update();
 
-
+        telemetryM.addData("setColor", setColor);
         if (Math.abs(shooter.limelight.getLatestResult().getTx()) > 2) {
             telemetryM.addData("target vision", shooter.getDegree() - shooter.limelight.getLatestResult().getTx());
         } else {

@@ -265,6 +265,7 @@ public class Auto extends RobotBase {
 
     @Override
     public void robotStop() {
+
     }
 }
 

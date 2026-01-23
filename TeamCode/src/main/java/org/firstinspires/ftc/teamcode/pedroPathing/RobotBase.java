@@ -31,12 +31,13 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 public abstract class RobotBase extends OpMode {
     public static Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
+    public static Pose savedPose = null;
     private Supplier<PathChain> pathChain;
     public TelemetryManager telemetryM;
 
-    protected ColorSpinner colorSpinner;  //
-    protected Shooter shooter;  //
-    protected Intake intake;  //
+    protected ColorSpinner colorSpinner;
+    protected Shooter shooter;
+    protected Intake intake;
     protected Foot foot;
 
     Gamepad.RumbleEffect effect = new Gamepad.RumbleEffect.Builder()
@@ -47,11 +48,13 @@ public abstract class RobotBase extends OpMode {
     public void init() {
         //follower
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
-        follower.update();
+//        follower.setStartingPose(follower.getPose());
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
-        robotInit(); // 執行自定義初始化邏輯
+        robotInit();
+//        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
+        follower.update();
+
         //setting
         colorSpinner = new ColorSpinner(hardwareMap, telemetry);
         intake = new Intake(hardwareMap, telemetry);
@@ -63,7 +66,6 @@ public abstract class RobotBase extends OpMode {
     }
 
     public void init_loop() {
-        // 等待比賽開始
         robotInitLoop();
         telemetry.addData("Status", "Waiting for start...");
         telemetry.update();
@@ -75,12 +77,13 @@ public abstract class RobotBase extends OpMode {
     }
 
     public void loop() {
-        robotLoop(); //比賽進行中，自定義執行邏輯
+        robotLoop();
+        savedPose = follower.getPose();
     }
 
     public void stop() {
         robotStop();
-        shooter.limelight.stop(); // 停止 Limelight
+        shooter.limelight.stop();
     }
 
     protected abstract void robotInit();

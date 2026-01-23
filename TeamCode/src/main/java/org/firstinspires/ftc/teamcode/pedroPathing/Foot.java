@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Foot {
     public Servo leftFoot, rightFoot;
 
@@ -14,11 +15,11 @@ public class Foot {
 
     public void robotUp() {
         leftFoot.setPosition(0.01);
-        rightFoot.setPosition(0.99);
+        rightFoot.setPosition(0.01);
     }
 
     public void robotDown() {
-        rightFoot.setPosition(0.01);
+        rightFoot.setPosition(0.99);
         leftFoot.setPosition(0.99);
     }
 }

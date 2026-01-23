@@ -8,6 +8,7 @@ import com.bylazar.configurables.annotations.Configurable;
 //@TeleOp(name = "Tele", group = "Linear OpMode")
 public abstract class Tele extends RobotBase {
     protected abstract int targetAprilTag();
+
     int temp = 0;
     boolean lastState = false;
 
@@ -27,6 +28,9 @@ public abstract class Tele extends RobotBase {
 
     @Override
     public void robotLoop() {
+        if (gamepad1.right_bumper) foot.robotUp();
+        else foot.robotDown();
+
         if (temp % 2 == 0) {
             setVelocity = 0;
             setYawDegree = -500;
@@ -34,11 +38,11 @@ public abstract class Tele extends RobotBase {
             if (gamepad1.right_trigger > 0.3) { //shooting
                 setShooting = true;
                 colorSpinner.on(1);
-                intake.off();
+                intake.slowMode();
             } else if (gamepad1.left_bumper) {  //out ball
                 setShooting = false;
                 colorSpinner.on(-1);
-                intake.off();
+                intake.out();
             } else if (gamepad1.left_trigger > 0.3) { //intake ball
                 setShooting = false;
                 colorSpinner.on(0.18);
@@ -87,9 +91,10 @@ public abstract class Tele extends RobotBase {
         follower.setTeleOpDrive(axial, lateral, -yaw * 0.8, true);
 
         telemetry.addData("ty", shooter.limelight.getLatestResult().getTy());
-        telemetry.addData("distance pinpoint", shooter.distance(0));
-        telemetry.addData("distance vision", shooter.d);
-        telemetry.addData("toVelocity", toVelocity);
+//        telemetry.addData("distance pinpoint", shooter.distance(0));
+//        telemetry.addData("distance vision", shooter.d);
+//        telemetry.addData("toVelocity", toVelocity);
+        telemetry.addData("target degree", toYawDegree);
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", Math.toDegrees(follower.getHeading()));
