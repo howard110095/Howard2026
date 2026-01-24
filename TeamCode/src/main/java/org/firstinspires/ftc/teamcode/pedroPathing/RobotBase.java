@@ -30,7 +30,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 @TeleOp
 public abstract class RobotBase extends OpMode {
     public static Follower follower;
-    public static Pose startingPose; //See ExampleAuto to understand how to use this
+    public static Pose startingPose = new Pose(0, 0, Math.toRadians(0)); //See ExampleAuto to understand how to use this
     public static Pose savedPose = null;
     private Supplier<PathChain> pathChain;
     public TelemetryManager telemetryM;
@@ -41,14 +41,13 @@ public abstract class RobotBase extends OpMode {
     protected Foot foot;
 
     Gamepad.RumbleEffect effect = new Gamepad.RumbleEffect.Builder()
-            .addStep(1.0, 1.0, 1000) // 右馬達全速震動 1000 毫秒
-            .addStep(0.0, 0.0, 1000) // 暫停 1000 毫秒
+            .addStep(1.0, 1.0, 1000) // work for 1000 microsecond
+            .addStep(0.0, 0.0, 1000) // stop for 1000 microsecond
             .build();
 
     public void init() {
         //follower
         follower = Constants.createFollower(hardwareMap);
-//        follower.setStartingPose(follower.getPose());
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         robotInit();

@@ -196,18 +196,20 @@ public class Auto extends RobotBase {
         autonomousPathUpdate();
         //vision
         intake.on();
-        setPitchDegree = 43;
-        if (pathState <= 11) setYawDegree = -55;
-        else if ((pathState == 12 || pathState == 13) && AprilTagNumber == 0) {
-            setYawDegree = -90;
+//        setPitchDegree = 43;
+//        if (pathState <= 11) setYawDegree = -55;
+        if ((pathState == 12 || pathState == 13) && AprilTagNumber == 0) {
+//            setYawDegree = -90;
             setAprilTagMode = 1;
-            AprilTagNumber = shooter.tagNumber();
+            if (AprilTagNumber == 0) AprilTagNumber = shooter.tagNumber();
         } else if (pathState >= 14) {
             setAprilTagMode = 2;
-            setYawDegree = -60;
+//            setYawDegree = -60;
+        } else {
+            setAprilTagMode = 2;
         }
 
-        shooter.shootingPRO(2, setVelocity, setYawDegree, setPitchDegree, setShooting);
+        shooter.shootingPRO(setAprilTagMode, setVelocity, setYawDegree, setPitchDegree, setShooting);
 
         if (spinDETECT) {
             colorSpinner.detect3posePRO();

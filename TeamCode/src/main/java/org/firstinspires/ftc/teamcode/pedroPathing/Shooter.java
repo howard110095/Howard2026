@@ -64,14 +64,29 @@ public class Shooter {
     }
 
     public double dx(int pipe) {
-        if (pipe == 0) return 66.0 - follower.getPose().getX();
-        else if (pipe == 1) return 0.0 - follower.getPose().getX();
-        else return -66.0 - follower.getPose().getX();
+        double x;
+        if (isAuto) {
+            if (pipe == 0) x = AutoRedX;
+            else if (pipe == 1) x = AutoMidX;
+            else x = AutoBlueX;
+        } else {
+            if (pipe == 0) x = TeleRedX;
+            else x = TeleBlueX;
+        }
+        return x - follower.getPose().getX();
     }
 
     public double dy(int pipe) {
-        if (pipe == 1) return 72.0 - follower.getPose().getY();
-        else return 69.0 - follower.getPose().getY();
+        double y;
+        if (isAuto) {
+            if (pipe == 0) y = AutoRedY;
+            else if (pipe == 1) y = AutoMidY;
+            else y = AutoBlueY;
+        } else {
+            if (pipe == 0) y = TeleRedY;
+            else y = TeleBlueY;
+        }
+        return y - follower.getPose().getY();
     }
 
     public double distance(int pipe) {
@@ -109,26 +124,24 @@ public class Shooter {
         // turret target yaw degree
         toYawDegree = turretTargetYaw;
         if (turretTargetYaw == -500) {  //tracking
-//            if (result != null && result.isValid()) {
+            double targetDegree;
+            if (dy(pipeline) < 0)
+                targetDegree = (dx(pipeline) >= 0) ? 0 : 180;   // right → 0, left → 180
+            else targetDegree = Math.toDegrees(Math.atan2(dy(pipeline), dx(pipeline)));
+            double heading = Math.toDegrees(follower.getPose().getHeading());
+            toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
+            if (result != null && result.isValid()) {
+                double deltaDegree = 0;
+                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = -5;
+                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 5;
+
                 //tracking formula
-//                if (Math.abs(result.getTx()) > 2) toYawDegree = getDegree() - result.getTx();
-//                else toYawDegree = getDegree();
-//                double p = (Math.abs(result.getTx()) > 10) ? -spinP : -0.015;
-//                double outputPower = result.getTx() * p;
-//                if (getDegree() > 90) outputPower = clamp(outputPower, -1, 0);
-//                else if (getDegree() < -90) outputPower = clamp(outputPower, 0, 1);
-//                shooterSpinnerPower(result.getTx() * p);
-//                toYawDegree = getDegree() - result.getTx();
-//                SpinnerPID.setPID(cameraP, cameraI, cameraD);
-//            } else {
-                double targetDegree;
-                if (dy(pipeline) < 0)
-                    targetDegree = (dx(pipeline) >= 0) ? 0 : 180;   // right → 0, left → 180
-                else targetDegree = Math.toDegrees(Math.atan2(dy(pipeline), dx(pipeline)));
-                double heading = Math.toDegrees(follower.getPose().getHeading());
-                toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
-//                SpinnerPID.setPID(spinP, spinI, spinD);
-//            }
+//                if (result.getTx() > 2) toYawDegree--;
+//                if (result.getTx() < -2) toYawDegree++;
+                toYawDegree -= (result.getTx() - deltaDegree) * 0.35;
+            } else {
+
+            }
         } else {
 //            SpinnerPID.setPID(spinP, spinI, spinD);
         }

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.geometry.Pose;
 
 @Configurable
 //@TeleOp(name = "Tele", group = "Linear OpMode")
@@ -14,7 +15,9 @@ public abstract class Tele extends RobotBase {
 
     @Override
     public void robotInit() {
-
+        isAuto = false;
+        if (savedPose != null) startingPose = savedPose;
+        follower.setStartingPose(startingPose);
     }
 
     @Override
@@ -28,6 +31,19 @@ public abstract class Tele extends RobotBase {
 
     @Override
     public void robotLoop() {
+        if (gamepad1.dpad_up) {
+            follower.update();
+            follower.setPose(InitCenter);
+        }
+        if (gamepad1.dpad_left) {
+            follower.update();
+            follower.setPose(InitBlueCorner);
+        }
+        if (gamepad1.dpad_right) {
+            follower.update();
+            follower.setPose(InitRedCorner);
+        }
+
         if (gamepad1.right_bumper) foot.robotUp();
         else foot.robotDown();
 
@@ -90,11 +106,12 @@ public abstract class Tele extends RobotBase {
         follower.update();
         follower.setTeleOpDrive(axial, lateral, -yaw * 0.8, true);
 
-        telemetry.addData("ty", shooter.limelight.getLatestResult().getTy());
+        telemetry.addData("tx", shooter.limelight.getLatestResult().getTx());
 //        telemetry.addData("distance pinpoint", shooter.distance(0));
 //        telemetry.addData("distance vision", shooter.d);
 //        telemetry.addData("toVelocity", toVelocity);
-        telemetry.addData("target degree", toYawDegree);
+//        telemetry.addData("target degree", toYawDegree);
+        telemetry.addData("savedPose", savedPose);
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", Math.toDegrees(follower.getHeading()));

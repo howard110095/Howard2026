@@ -6,7 +6,7 @@ import com.pedropathing.geometry.Pose;
 @Configurable
 public class RobotConstants {
     //mode
-    public static boolean isAuto = false;
+    public static boolean isAuto = true;
     // shooting pro constant
     public static int setAprilTagMode = 0;
     public static double toVelocity = 0, toYawDegree = -500, toPitchDegree = 0;
@@ -18,11 +18,19 @@ public class RobotConstants {
     public static double spinP = 0.018, spinI = 0.08, spinD = 0.0008;
     public static double cameraP = 0.02, cameraI = 0.015, cameraD = 0.002;
 
+    //tele op
+    public static Pose InitRedCorner = new Pose(59.5, -63, Math.toRadians(0));
+    public static Pose InitCenter = new Pose(0, 0, Math.toRadians(90));
+    public static Pose InitBlueCorner = new Pose(-59.5, -63, Math.toRadians(180));
+
+    //field
+    public static double AutoBlueX = -66, AutoBlueY = 69, AutoRedX = 66, AutoRedY = 69, AutoMidX = 0, AutoMidY = 72;
+    public static double TeleBlueX = -66, TeleBlueY = 66, TeleRedX = 66, TeleRedY = 66;
+
     //Auto
     public static double shootingTime = 2.5;
     public static int AprilTagNumber = 0;
     public static double AutoVelocity = 3650, toReadyShootingTime = 0.5;
-
 
 
     //blue pose

@@ -14,13 +14,21 @@ public class Foot {
     }
 
     public void robotUp() {
-        leftFoot.setPosition(0.01);
+           // white
+        leftFoot.setPosition(0.99);
         rightFoot.setPosition(0.01);
+        //   // black
+//        leftFoot.setPosition(0.01);
+//        rightFoot.setPosition(0.01);
     }
 
     public void robotDown() {
+         //white
+        leftFoot.setPosition(0.01);
         rightFoot.setPosition(0.99);
-        leftFoot.setPosition(0.99);
+//         //black
+//        rightFoot.setPosition(0.99);
+//        leftFoot.setPosition(0.99);
     }
 }
 

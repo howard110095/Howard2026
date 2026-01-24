@@ -17,16 +17,12 @@ public class TeleTest extends RobotBase {
     @Override
     public void robotInit() {
         if (savedPose != null) startingPose = savedPose;
-        else startingPose = startBluePose; // 或 new Pose()
         follower.setStartingPose(startingPose);
     }
 
     @Override
     protected void robotInitLoop() {
         telemetry.addData("SavedPose", (savedPose != null) ? "YES" : "NO");
-//        shooter.cameraP = 0.02;
-//        shooter.cameraI = 0.015;
-//        shooter.cameraD = 0.002;
     }
 
     @Override
@@ -36,16 +32,8 @@ public class TeleTest extends RobotBase {
 
     @Override
     public void robotLoop() {
-
-
-
-        intake.slowMode();
-        colorSpinner.on(0.3);
-        shooter.elevator.setPower(1);
-        shooter.shooterU.setPower(0.5);
-        shooter.shooterD.setPower(0.5);
-        shooter.arm.setPosition(position);
-
+        shooter.shooterSpinner1.setPosition(0.5);
+        shooter.shooterSpinner2.setPosition(0.5);
 
         // drive
         double axial = -gamepad1.left_stick_y;
@@ -69,11 +57,9 @@ public class TeleTest extends RobotBase {
         telemetry.update();
 
         telemetryM.addData("setColor", setColor);
-        if (Math.abs(shooter.limelight.getLatestResult().getTx()) > 2) {
-            telemetryM.addData("target vision", shooter.getDegree() - shooter.limelight.getLatestResult().getTx());
-        } else {
-            telemetryM.addData("target vision", shooter.getDegree());
-        }
+
+
+
         telemetryM.addData("get now", shooter.getDegree());
         telemetryM.addData("target", rpm);
         telemetryM.addData("up velocity rpm", shooter.shooterU.getVelocity() / 28.0 * 60.0);
