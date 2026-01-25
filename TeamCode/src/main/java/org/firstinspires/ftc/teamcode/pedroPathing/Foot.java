@@ -17,7 +17,7 @@ public class Foot {
            // white
         leftFoot.setPosition(0.99);
         rightFoot.setPosition(0.01);
-        //   // black
+//           // black
 //        leftFoot.setPosition(0.01);
 //        rightFoot.setPosition(0.01);
     }
@@ -27,8 +27,16 @@ public class Foot {
         leftFoot.setPosition(0.01);
         rightFoot.setPosition(0.99);
 //         //black
-//        rightFoot.setPosition(0.99);
 //        leftFoot.setPosition(0.99);
+//        rightFoot.setPosition(0.99);
+    }
+    public void robotDefend() {
+         //white
+        leftFoot.setPosition(0.3);
+        rightFoot.setPosition(0.7);
+//         //black
+//        leftFoot.setPosition(0.7);
+//        rightFoot.setPosition(0.7);
     }
 }
 

@@ -102,11 +102,12 @@ public class Shooter {
         toVelocity = targetVelocity;
         if (targetVelocity == 0) {  //tracking
             if (result != null && result.isValid()) { //have apriltag, velocity
-                d = (29.5 - 14) / Math.tan(Math.toRadians(19.41 + limelight.getLatestResult().getTy()));
-                d += 20;
+                d = 20.0 + ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + limelight.getLatestResult().getTy())));
                 toVelocity = 11.144 * d + 2376.3;
             } else
                 toVelocity = 11.144 * distance(pipeline) + 2376.3; // no apriltag, velocity formula
+
+            toVelocity += velocityOffset;
         }
         double velocity1 = toVelocity / 4600;
         double velocity2 = toVelocity / 4300;
@@ -132,25 +133,19 @@ public class Shooter {
             toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
             if (result != null && result.isValid()) {
                 double deltaDegree = 0;
-                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = -5;
-                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 5;
-
-                //tracking formula
-//                if (result.getTx() > 2) toYawDegree--;
-//                if (result.getTx() < -2) toYawDegree++;
+                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = -3;
+                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 3;
                 toYawDegree -= (result.getTx() - deltaDegree) * 0.35;
-            } else {
-
             }
-        } else {
-//            SpinnerPID.setPID(spinP, spinI, spinD);
         }
         toDegree(toYawDegree);
 
         // turret target pitch degree
         toPitchDegree = turretTargetPitch;
-        if (turretTargetPitch == 0)   //tracking
-            toPitchDegree = 0.3472 * distance(pipeline) + 12.679;
+        if (turretTargetPitch == 0) {
+            if (result != null && result.isValid()) toPitchDegree = 0.3472 * d + 12.679;
+            else toPitchDegree = 0.3472 * distance(pipeline) + 12.679;
+        }
         pitchDegree(toPitchDegree);
 
         // shooting or not

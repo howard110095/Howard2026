@@ -19,7 +19,7 @@ public class Auto extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Path park;
-    private PathChain path0, path1_go, path1_back, path2, path3;
+    private PathChain path0, path1_go, path1_back, path2, path3, path4;
     public static boolean spinDETECT = false;
 
     public void buildPaths() {
@@ -48,10 +48,13 @@ public class Auto extends RobotBase {
         path3 = follower.pathBuilder()
                 .addPath(new BezierCurve(shootingBluePose, blueControl3, blueRoll3))
                 .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll3.getHeading())
-//                .addPath(new BezierCurve(blueRoll3, blueControl3, shootingBluePose))
-//                .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
                 .addPath(new BezierLine(blueRoll3, shootingBluePose))
                 .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
+                .build();
+
+        path4 = follower.pathBuilder()
+                .addPath(new BezierLine(shootingBluePose, blueStop1))
+                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueStop1.getHeading())
                 .build();
     }
 
@@ -65,16 +68,18 @@ public class Auto extends RobotBase {
                 setPathState(2);
             }
         } else if (pathState == 2) {
-            colorSpinner.on(1);
+            colorSpinner.on();
             setShooting = true;
-            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(11);
+            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(10);
         }
         //to 1 roll
-        else if (pathState == 11) {
+        else if (pathState == 10) {
+            if (pathTimer.getElapsedTimeSeconds() > 0.3) setPathState(11);
+        } else if (pathState == 11) {
             if (!follower.isBusy()) {
 //                intake.on();
                 setShooting = false;
-                colorSpinner.on(0.18);
+                colorSpinner.slowMode();
                 follower.followPath(path1_go, true);
                 colorSpinner.colorRenew();
                 setPathState(12);
@@ -84,16 +89,15 @@ public class Auto extends RobotBase {
                 setPathState(13);
             }
         } else if (pathState == 13) {
-            if (pathTimer.getElapsedTimeSeconds() > 1.7) setPathState(14);
+            if (pathTimer.getElapsedTimeSeconds() > 1.2) setPathState(14);
         } else if (pathState == 14) {
-            shooter.toDegree(-60);
-            if (AprilTagNumber == 0) AprilTagNumber = 21;
+            spinDETECT = true;
+            if (!(21 <= AprilTagNumber && AprilTagNumber <= 23)) AprilTagNumber = 21;
 //            intake.on();
             follower.followPath(path1_back, true);
             setPathState(15);
         } else if (pathState == 15) {
             if (follower.getPose().getX() > -40) {
-                spinDETECT = true;
                 setPathState(16);
             }
         } else if (pathState == 16) {
@@ -109,7 +113,7 @@ public class Auto extends RobotBase {
             colorSpinner.logic(AprilTagNumber);
             if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(19);
         } else if (pathState == 19) {
-            colorSpinner.on(1);
+            colorSpinner.on();
             setShooting = true;
             if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(21);
         }
@@ -118,7 +122,7 @@ public class Auto extends RobotBase {
             if (!follower.isBusy()) {
 //                intake.on();
                 setShooting = false;
-                colorSpinner.on(0.18);
+                colorSpinner.slowMode();
                 follower.followPath(path2, true);
                 colorSpinner.colorRenew();
                 setPathState(22);
@@ -143,7 +147,7 @@ public class Auto extends RobotBase {
             colorSpinner.logic(AprilTagNumber);
             if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(28);
         } else if (pathState == 28) {
-            colorSpinner.on(1);
+            colorSpinner.on();
             setShooting = true;
             if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(31);
         }
@@ -152,7 +156,7 @@ public class Auto extends RobotBase {
             if (!follower.isBusy()) {
 //                intake.on();
                 setShooting = false;
-                colorSpinner.on(0.18);
+                colorSpinner.slowMode();
                 follower.followPath(path3, true);
                 colorSpinner.colorRenew();
                 setPathState(32);
@@ -166,7 +170,6 @@ public class Auto extends RobotBase {
             }
         } else if (pathState == 34) {
             if (!follower.isBusy()) {
-//                intake.off();
                 setPathState(36);
             }
         } else if (pathState == 36) {
@@ -177,9 +180,15 @@ public class Auto extends RobotBase {
             colorSpinner.logic(AprilTagNumber);
             if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(38);
         } else if (pathState == 38) {
-            colorSpinner.on(1);
+            colorSpinner.on();
             setShooting = true;
-            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(-1);
+            if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(41);
+        } else if (pathState == 41) {
+            if (!follower.isBusy()) {
+                setShooting = false;
+                follower.followPath(path4, true);
+                setPathState(-1);
+            }
         } else {
             setShooting = false;
         }
@@ -196,35 +205,22 @@ public class Auto extends RobotBase {
         autonomousPathUpdate();
         //vision
         intake.on();
-//        setPitchDegree = 43;
-//        if (pathState <= 11) setYawDegree = -55;
-        if ((pathState == 12 || pathState == 13) && AprilTagNumber == 0) {
-//            setYawDegree = -90;
+        if (10 <= pathState && pathState <= 13 && !(21 <= AprilTagNumber && AprilTagNumber <= 23)) {
             setAprilTagMode = 1;
-            if (AprilTagNumber == 0) AprilTagNumber = shooter.tagNumber();
-        } else if (pathState >= 14) {
-            setAprilTagMode = 2;
-//            setYawDegree = -60;
-        } else {
-            setAprilTagMode = 2;
-        }
+            AprilTagNumber = shooter.tagNumber();
+        } else setAprilTagMode = 2;
 
         shooter.shootingPRO(setAprilTagMode, setVelocity, setYawDegree, setPitchDegree, setShooting);
 
-        if (spinDETECT) {
-            colorSpinner.detect3posePRO();
-        }
+        if (spinDETECT) colorSpinner.detect3posePRO();
+
 
         telemetry.addData("number", AprilTagNumber);
         telemetry.addData("1", colorSpinner.place1);
         telemetry.addData("2", colorSpinner.place2);
         telemetry.addData("3", colorSpinner.place3);
         telemetry.addData("getTx", shooter.limelight.getLatestResult().getTx());
-        telemetry.addData("uVelocity", shooter.uVelocity);
-        telemetry.addData("dVelocity", shooter.dVelocity);
-        telemetry.addData("dVelocity", shooter.shooterVelocity);
-        telemetry.addData("shooterU_power", shooter.shooterU_power);
-        telemetry.addData("shooterD_power", shooter.shooterD_power);
+        telemetry.addData("detect color", spinDETECT);
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());

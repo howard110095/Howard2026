@@ -37,8 +37,16 @@ public class ColorSpinner {
         spin.setPower(0);
     }
 
-    public void on(double power) {
-        spin.setPower(power);
+    public void on() {
+        spin.setPower(1);
+    }
+
+    public void slowMode() {
+        spin.setPower(0.3);
+    }
+
+    public void out() {
+        spin.setPower(-1);
     }
 
     public double getPose() {

@@ -7,16 +7,18 @@ import com.pedropathing.geometry.Pose;
 public class RobotConstants {
     //mode
     public static boolean isAuto = true;
+
     // shooting pro constant
     public static int setAprilTagMode = 0;
     public static double toVelocity = 0, toYawDegree = -500, toPitchDegree = 0;
     public static double setVelocity = 0, setYawDegree = -500, setPitchDegree = 0;
     public static boolean setShooting = false;
 
-    public static double ukP = 3.2, ukI = 0.13, ukD = 0.003;
-    public static double dkP = 3.2, dkI = 0.13, dkD = 0.003;
-    public static double spinP = 0.018, spinI = 0.08, spinD = 0.0008;
-    public static double cameraP = 0.02, cameraI = 0.015, cameraD = 0.002;
+    //shooter pid
+    public static double ukP = 3.2, ukI = 0.13, ukD = 0.003, dkP = 3.2, dkI = 0.13, dkD = 0.003;
+
+    //Offset
+    public static double velocityOffset = 0, yawDegreeOffset = 0;
 
     //tele op
     public static Pose InitRedCorner = new Pose(59.5, -63, Math.toRadians(0));
@@ -28,9 +30,8 @@ public class RobotConstants {
     public static double TeleBlueX = -66, TeleBlueY = 66, TeleRedX = 66, TeleRedY = 66;
 
     //Auto
-    public static double shootingTime = 2.5;
+    public static double shootingTime = 2.2, toReadyShootingTime = 0.5;
     public static int AprilTagNumber = 0;
-    public static double AutoVelocity = 3650, toReadyShootingTime = 0.5;
 
 
     //blue pose
@@ -42,6 +43,7 @@ public class RobotConstants {
     public static Pose blueRoll2 = new Pose(-56, -12, Math.toRadians(180));
     public static Pose blueControl3 = new Pose(-12, -36, Math.toRadians(180));
     public static Pose blueRoll3 = new Pose(-56, -36, Math.toRadians(180));
+    public static Pose blueStop1 = new Pose(-36, 0, Math.toRadians(180));
 
 
     public static Pose blueLongShootingPose = new Pose(-15, -57.5, Math.toRadians(180));

@@ -32,8 +32,8 @@ public class TeleTest extends RobotBase {
 
     @Override
     public void robotLoop() {
-        shooter.shooterSpinner1.setPosition(0.5);
-        shooter.shooterSpinner2.setPosition(0.5);
+        foot.rightFoot.setPosition(position);
+        foot.leftFoot.setPosition(position);
 
         // drive
         double axial = -gamepad1.left_stick_y;

@@ -60,6 +60,9 @@ public abstract class RobotBase extends OpMode {
         shooter = new Shooter(hardwareMap, telemetry);
         foot = new Foot(hardwareMap, telemetry);
 
+        //april tag
+        AprilTagNumber = 0;
+
         telemetry.addData("init", "done");
         telemetry.update();
     }
