@@ -24,6 +24,7 @@ import java.util.List;
 
 @Configurable
 public class Shooter {
+    public boolean isLastShoot = false;
     public static double poseTarget = 0.5, poseDelta = 0;
     public DcMotorEx shooterU, shooterD, elevator;
     public Servo arm, turretPitchL, turretPitchR, shooterSpinner1, shooterSpinner2, led;
@@ -149,13 +150,30 @@ public class Shooter {
         pitchDegree(toPitchDegree);
 
         // shooting or not
-        if (openShooting && isAuto) elevatorUp();
-        else if (openShooting && !isAuto && Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1)
+        if (!openShooting) {
+            isLastShoot = false;
+            shooterU.setPower(0);
+            shooterD.setPower(0);
+            elevatorOff();
+        } else if (openShooting && isAuto) {
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
             elevatorUp();
-        else elevatorOff();
+        } else if (openShooting && isLastShoot) {
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
+            elevatorUp();
+        } else if (openShooting && !isAuto && Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1) {
+            isLastShoot = true;
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
+            elevatorUp();
+        } else {
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
+            elevatorOff();
+        }
 
-        if (result != null && result.isValid()) led.setPosition(0.55);
-        else led.setPosition(0.3);
     }
 
     public int tagNumber() {
@@ -197,6 +215,7 @@ public class Shooter {
     public void toDegree(double target) {
         target = clamp(target, -90, 90);
         double pp = 0.5 + target * 0.56 / 180.0;
+        pp -= yawDegreeOffset * 0.01;
 ////        SpinnerPID.setPID(0.018, 0.08, 0.0008);
 //        double power = SpinnerPID.calculate(getDegree(), target);
 //        power = clamp(power, -0.2, 0.2);

@@ -11,6 +11,7 @@ import com.bylazar.configurables.annotations.Configurable;
 public abstract class Tele extends RobotBase {
     protected abstract int targetAprilTag();
 
+    public boolean driveMode = false;
     public double hangVelocity = 3500, hangYawDegree = 0, hangPitch = 45;
     int modeTemp = 0, endTemp = 0;
     boolean last1Y = false, last1A = false, last1RB;
@@ -50,6 +51,9 @@ public abstract class Tele extends RobotBase {
 
         if (endTemp % 3 == 0) { //normal
             foot.robotDown();
+            yawDegreeOffset += gamepad2.right_stick_x;
+            if(gamepad2.y) yawDegreeOffset = 0;
+
             if (gamepad1.right_trigger > 0.3) { //shooting
                 setShooting = true;
                 colorSpinner.on();
@@ -65,10 +69,11 @@ public abstract class Tele extends RobotBase {
             } else {
                 setShooting = false;
                 colorSpinner.slowMode();
-                intake.off();
+                intake.on();
             }
 
             if (modeTemp % 2 == 0) {
+                shooter.led.setPosition(0.6);
                 setVelocity = 0;
                 setYawDegree = -500;
                 setPitchDegree = 0;
@@ -78,22 +83,21 @@ public abstract class Tele extends RobotBase {
             }
             // vision, pinpoint are not work
             else {
-                hangVelocity -= gamepad2.left_stick_y * 40.0;
-                hangYawDegree += gamepad2.right_stick_x * 0.8;
-                if (gamepad2.y) hangPitch += 1.0;
-                else if (gamepad2.a) hangPitch -= 1.0;
+                shooter.led.setPosition(0.35);
+                hangYawDegree -= gamepad2.right_stick_x * 0.8;
+                hangPitch -= gamepad2.left_stick_y * 0.8;
 
                 hangYawDegree = clamp(hangYawDegree, -90.0, 90.0);
                 hangPitch = clamp(hangPitch, 24.0, 49.0);
 
-                setVelocity = hangVelocity;
                 setYawDegree = hangYawDegree;
                 setPitchDegree = hangPitch;
                 telemetry.addData("Mode", "Hand Mode");
             }
             //set shooting constant
             shooter.shootingPRO(targetAprilTag(), setVelocity, setYawDegree, setPitchDegree, setShooting);
-        } else {
+        }
+        else {
             modeTemp = 0;
             shooter.toDegree(90);
             colorSpinner.on();
@@ -115,8 +119,11 @@ public abstract class Tele extends RobotBase {
         double axial = -gamepad1.left_stick_y;
         double lateral = -gamepad1.left_stick_x;
         double yaw = -gamepad1.right_stick_x;
+
         follower.update();
-        follower.setTeleOpDrive(axial, lateral, yaw * 0.8, true);
+        if (gamepad1.left_stick_button) driveMode = true;
+        if (gamepad1.right_stick_button) driveMode = false;
+        follower.setTeleOpDrive(axial, lateral, yaw * 0.8, driveMode);
 
         telemetry.addData("tx", shooter.limelight.getLatestResult().getTx());
         telemetry.addData("savedPose", savedPose);
