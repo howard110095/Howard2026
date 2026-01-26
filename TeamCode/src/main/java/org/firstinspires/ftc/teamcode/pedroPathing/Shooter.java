@@ -72,7 +72,8 @@ public class Shooter {
             else x = AutoBlueX;
         } else {
             if (pipe == 0) x = TeleRedX;
-            else x = TeleBlueX;
+            else if (pipe == 2) x = TeleBlueX;
+            else x = -TeleBlueX;
         }
         return x - follower.getPose().getX();
     }
@@ -85,7 +86,8 @@ public class Shooter {
             else y = AutoBlueY;
         } else {
             if (pipe == 0) y = TeleRedY;
-            else y = TeleBlueY;
+            else if (pipe == 2) y = TeleBlueY;
+            else y = -TeleBlueY;
         }
         return y - follower.getPose().getY();
     }
@@ -96,7 +98,7 @@ public class Shooter {
 
     public void shootingPRO(int pipeline, double targetVelocity, double turretTargetYaw, double turretTargetPitch, boolean openShooting) {
         // setting pipe line
-        limelight.pipelineSwitch(pipeline);
+        limelight.pipelineSwitch(Math.abs(pipeline));
         LLResult result = limelight.getLatestResult();
 
         // shooting Velocity

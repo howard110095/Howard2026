@@ -4,6 +4,7 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.geometry.Pose;
 
 
 @Configurable
@@ -13,12 +14,11 @@ public abstract class Tele extends RobotBase {
 
     public boolean driveMode = false;
     public double hangVelocity = 3500, hangYawDegree = 0, hangPitch = 45;
-    int modeTemp = 0, endTemp = 0;
-    boolean last1Y = false, last1A = false, last1RB;
+    int modeTemp = 0, endTemp = 0, EndGameMode = 0;
+    boolean last1Y = false, last1A = false, last1RB, NormalMode = true;
 
     @Override
     public void robotInit() {
-        velocityOffset = 0;
         yawDegreeOffset = 0;
         isAuto = false;
         if (savedPose != null) startingPose = savedPose;
@@ -36,82 +36,52 @@ public abstract class Tele extends RobotBase {
 
     @Override
     public void robotLoop() {
+        //InitPose();
         if (gamepad1.dpad_up) {
-            follower.update();
+//            follower.update();
             follower.setPose(InitCenter);
         }
         if (gamepad1.dpad_left) {
-            follower.update();
+//            follower.update();
             follower.setPose(InitBlueCorner);
         }
         if (gamepad1.dpad_right) {
-            follower.update();
+//            follower.update();
             follower.setPose(InitRedCorner);
         }
 
-        if (endTemp % 3 == 0) { //normal
+
+        if (gamepad1.y) EndGameMode = 3;
+        if (gamepad1.b) EndGameMode = 2;
+        if (gamepad1.x) EndGameMode = 1;
+        if (gamepad1.a) EndGameMode = 0;
+        if (gamepad2.y) yawDegreeOffset = 0;
+
+        if (EndGameMode != 0) {
+            if (EndGameMode == 3) foot.robotUp();
+            else if (EndGameMode == 2) foot.robotDefend();
+            else if (EndGameMode == 1) foot.robotDown();
+
+            shooter.toDegree(90);
+            shooter.shooterU.setPower(0);
+            shooter.shooterD.setPower(0);
+            colorSpinner.spin.setPower(0);
+            intake.off();
+        } else {
             foot.robotDown();
             yawDegreeOffset += gamepad2.right_stick_x;
-            if(gamepad2.y) yawDegreeOffset = 0;
 
-            if (gamepad1.right_trigger > 0.3) { //shooting
-                setShooting = true;
-                colorSpinner.on();
-                intake.on();
-            } else if (gamepad1.left_bumper) {  //out ball
-                setShooting = false;
-                colorSpinner.out();
-                intake.out();
-            } else if (gamepad1.left_trigger > 0.3) { //intake ball
-                setShooting = false;
-                colorSpinner.slowMode();
-                intake.on();
-            } else {
-                setShooting = false;
-                colorSpinner.slowMode();
-                intake.on();
-            }
+            ShooterIntakeControl();
 
-            if (modeTemp % 2 == 0) {
-                shooter.led.setPosition(0.6);
-                setVelocity = 0;
-                setYawDegree = -500;
-                setPitchDegree = 0;
-                if (shooter.limelight.getLatestResult() != null && shooter.limelight.getLatestResult().isValid())
-                    telemetry.addData("Mode", "Auto Tracking");
-                else telemetry.addData("Mode", "Field Tracking");
-            }
-            // vision, pinpoint are not work
-            else {
-                shooter.led.setPosition(0.35);
-                hangYawDegree -= gamepad2.right_stick_x * 0.8;
-                hangPitch -= gamepad2.left_stick_y * 0.8;
+            if (NormalMode) AutoTrackingMode();
+            else HandMode(); // vision, pinpoint are not work (fool mode)
 
-                hangYawDegree = clamp(hangYawDegree, -90.0, 90.0);
-                hangPitch = clamp(hangPitch, 24.0, 49.0);
-
-                setYawDegree = hangYawDegree;
-                setPitchDegree = hangPitch;
-                telemetry.addData("Mode", "Hand Mode");
-            }
             //set shooting constant
             shooter.shootingPRO(targetAprilTag(), setVelocity, setYawDegree, setPitchDegree, setShooting);
         }
-        else {
-            modeTemp = 0;
-            shooter.toDegree(90);
-            colorSpinner.on();
-            intake.off();
-            if (endTemp % 3 == 1) foot.robotDefend();
-            else foot.robotUp();
-        }
 
-        if (!last1Y && gamepad1.y) endTemp++;
-        else if (!last1RB && gamepad1.right_bumper) endTemp = 0;
-        last1Y = gamepad1.y;
-        last1RB = gamepad1.left_bumper;
 
-        if (!last1A && gamepad1.a) modeTemp++;
+        if (!last1A && gamepad1.a) NormalMode = !NormalMode;
         last1A = gamepad1.a;
 
 
@@ -127,7 +97,6 @@ public abstract class Tele extends RobotBase {
 
         telemetry.addData("tx", shooter.limelight.getLatestResult().getTx());
         telemetry.addData("savedPose", savedPose);
-        telemetry.addData("hangVelocity", hangVelocity);
         telemetry.addData("hangYawDegree", hangYawDegree);
         telemetry.addData("hangPitch", hangPitch);
         telemetry.addData("X", follower.getPose().getX());
@@ -137,6 +106,72 @@ public abstract class Tele extends RobotBase {
     }
 
     public void robotStop() {
+    }
+
+    public void InitPose() {
+        if (targetAprilTag() == 2 && !driveMode) {
+            if (gamepad2.dpad_up)
+                follower.setPose(new Pose(39, -63, Math.toRadians(270))); //blue area
+            if (gamepad2.dpad_right)
+                follower.setPose(new Pose(-39, -63, Math.toRadians(270))); //red area
+            if (gamepad2.dpad_left)
+                follower.setPose(new Pose(63, 63, Math.toRadians(0))); //red human
+            if (gamepad2.dpad_down)
+                follower.setPose(new Pose(-63, 63, Math.toRadians(180))); //blue human
+        } else {
+            if (gamepad2.dpad_up)
+                follower.setPose(new Pose(39, 63, Math.toRadians(90))); //red area
+            if (gamepad2.dpad_right)
+                follower.setPose(new Pose(-39, 63, Math.toRadians(90))); //blue area
+            if (gamepad2.dpad_left)
+                follower.setPose(new Pose(63, -63, Math.toRadians(0))); //blue human
+            if (gamepad2.dpad_down)
+                follower.setPose(new Pose(-63, -63, Math.toRadians(180))); //red human
+        }
+    }
+
+    public void ShooterIntakeControl() {
+        if (gamepad1.right_trigger > 0.3) { //shooting
+            setShooting = true;
+            colorSpinner.on();
+            intake.on();
+        } else if (gamepad1.left_bumper) {  //out ball
+            setShooting = false;
+            colorSpinner.out();
+            intake.out();
+        } else if (gamepad1.left_trigger > 0.3) { //intake ball
+            setShooting = false;
+            colorSpinner.slowMode();
+            intake.on();
+        } else {
+            setShooting = false;
+            colorSpinner.slowMode();
+            intake.on();
+        }
+    }
+
+    public void AutoTrackingMode() {
+        shooter.led.setPosition(0.6);
+        setVelocity = 0;
+        setYawDegree = -500;
+        setPitchDegree = 0;
+        if (shooter.limelight.getLatestResult() != null && shooter.limelight.getLatestResult().isValid())
+            telemetry.addData("Mode", "Auto Tracking");
+        else telemetry.addData("Mode", "Field Tracking");
+    }
+
+    public void HandMode() {
+        shooter.led.setPosition(0.35); // set LED color
+        hangYawDegree -= gamepad2.right_stick_x * 0.8; // adjust turret yaw degree
+        hangPitch -= gamepad2.left_stick_y * 0.8; // adjust pitch degree
+
+        hangYawDegree = clamp(hangYawDegree, -90.0, 90.0);
+        hangPitch = clamp(hangPitch, 24.0, 49.0);
+
+        setVelocity = 3500;
+        setYawDegree = hangYawDegree;
+        setPitchDegree = hangPitch;
+        telemetry.addData("Mode", "Hand Mode");
     }
 }
 

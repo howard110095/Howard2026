@@ -42,7 +42,7 @@ public class ColorSpinner {
     }
 
     public void slowMode() {
-        spin.setPower(0.3);
+        spin.setPower(0.4);
     }
 
     public void out() {

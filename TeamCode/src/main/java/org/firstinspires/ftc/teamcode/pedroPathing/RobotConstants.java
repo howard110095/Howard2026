@@ -18,7 +18,7 @@ public class RobotConstants {
     public static double ukP = 3.2, ukI = 0.13, ukD = 0.003, dkP = 3.2, dkI = 0.13, dkD = 0.003;
 
     //Offset
-    public static double velocityOffset = 0, yawDegreeOffset = 0;
+    public static double  yawDegreeOffset = 0;
 
     //tele op
     public static Pose InitRedCorner = new Pose(59.5, -63, Math.toRadians(0));
