@@ -109,8 +109,6 @@ public class Shooter {
                 toVelocity = 11.144 * d + 2376.3;
             } else
                 toVelocity = 11.144 * distance(pipeline) + 2376.3; // no apriltag, velocity formula
-
-            toVelocity += velocityOffset;
         }
         double velocity1 = toVelocity / 4600;
         double velocity2 = toVelocity / 4300;
