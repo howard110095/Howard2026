@@ -1,29 +1,26 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing.Constant;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-
-import androidx.core.content.pm.PermissionInfoCompat;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.util.function.Supplier;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Subsystems.ColorSpinner;
+import org.firstinspires.ftc.teamcode.pedroPathing.Subsystems.Foot;
+import org.firstinspires.ftc.teamcode.pedroPathing.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.pedroPathing.Subsystems.Shooter;
 
 
 @Configurable

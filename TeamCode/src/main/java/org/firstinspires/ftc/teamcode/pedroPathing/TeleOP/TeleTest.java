@@ -1,12 +1,11 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing.TeleOP;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 
 @Configurable
 @TeleOp(name = "TeleTest", group = "Linear OpMode")

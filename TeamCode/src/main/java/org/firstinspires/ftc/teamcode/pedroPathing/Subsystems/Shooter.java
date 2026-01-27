@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing.Subsystems;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.RobotBase.follower;
-import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase.follower;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -11,14 +11,10 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 
 import java.util.List;
 

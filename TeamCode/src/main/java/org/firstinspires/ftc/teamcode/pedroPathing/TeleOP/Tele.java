@@ -1,10 +1,12 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing.TeleOP;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
-import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 
 
 @Configurable

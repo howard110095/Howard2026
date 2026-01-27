@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing.TeleOP;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 

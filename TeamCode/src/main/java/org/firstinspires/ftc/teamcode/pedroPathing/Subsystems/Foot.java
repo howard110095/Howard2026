@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing.Subsystems;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -31,12 +31,12 @@ public class Foot {
         rightFoot.setPosition(0.99);
     }
     public void robotDefend() {
-         //white
+//        //white
 //        leftFoot.setPosition(0.4);
 //        rightFoot.setPosition(0.6);
          //black
         leftFoot.setPosition(0.6);
-        rightFoot.setPosition(0.6) ;
+        rightFoot.setPosition(0.6);
     }
 }
 

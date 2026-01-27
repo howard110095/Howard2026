@@ -1,50 +1,46 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing.Auto;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.geometry.Pose;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 
 @Configurable
-@Autonomous(name = "Auto1", group = "Examples")
-public class Auto1 extends RobotBase {
+@Autonomous(name = "Auto2", group = "Examples")
+public class BlueP2 extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState, time = 0;
     private Path park;
-    private PathChain path0, path1, pathToGate, pathBackGate;
+    private PathChain path0, path1, pathToTakeBall;
 
     public void buildPaths() {
         path0 = follower.pathBuilder()
-                .addPath(new BezierLine(startBluePose, shootingBlueSeePose))
-                .setLinearHeadingInterpolation(startBluePose.getHeading(), shootingBlueSeePose.getHeading())
+                .addPath(new BezierLine(startBlueLongPose, blueLongShootingPose))
+                .setLinearHeadingInterpolation(startBlueLongPose.getHeading(), blueLongShootingPose.getHeading())
                 .build();
 
         path1 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootingBlueSeePose, blueControl2, blueRoll2))
-                .setLinearHeadingInterpolation(shootingBlueSeePose.getHeading(), blueRoll2.getHeading())
-                .addPath(new BezierCurve(blueRoll2, blueControl2, shootingBluePose))
-                .setLinearHeadingInterpolation(blueRoll2.getHeading(), shootingBluePose.getHeading())
+                .addPath(new BezierCurve(blueLongShootingPose, blueControl3_2, blueRoll3_2))
+                .setLinearHeadingInterpolation(blueLongShootingPose.getHeading(), blueRoll3_2.getHeading())
+                .addPath(new BezierLine(blueRoll3_2, blueLongShootingPose))
+                .setLinearHeadingInterpolation(blueRoll3_2.getHeading(), blueLongShootingPose.getHeading())
                 .build();
 
-        pathToGate = follower.pathBuilder()
-                .addPath(new BezierCurve(shootingBluePose, blueToGateControl2, blueOpenGate))
-                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueOpenGate.getHeading())
-                .addPath(new BezierLine(blueOpenGate, blueCatchFromGate))
-                .setLinearHeadingInterpolation(blueOpenGate.getHeading(), blueCatchFromGate.getHeading())
+        pathToTakeBall = follower.pathBuilder()
+                .addPath(new BezierLine(blueLongShootingPose, blueCorner))
+                .setLinearHeadingInterpolation(blueLongShootingPose.getHeading(), blueCorner.getHeading())
+                .addPath(new BezierLine(blueCorner, blueLongShootingPose))
+                .setLinearHeadingInterpolation(blueCorner.getHeading(), blueLongShootingPose.getHeading())
                 .build();
 
-        pathBackGate = follower.pathBuilder()
-                .addPath(new BezierCurve(blueCatchFromGate, blueBackFromGateControl, shootingBluePose))
-                .setLinearHeadingInterpolation(blueCatchFromGate.getHeading(), shootingBluePose.getHeading())
-                .build();
+
 //
 //        .
 //        addPath(new BezierCurve(new Point(preloadPose), new Point(15, 36, Point.CARTESIAN), new Point(61, 36.25, Point.CARTESIAN), new Point(59, 26.000, Point.CARTESIAN)))
@@ -59,26 +55,24 @@ public class Auto1 extends RobotBase {
 
     public void autonomousPathUpdate() {
         if (pathState == 0) {
-            colorSpinner.slowMode();
-            setShooting = false;
             follower.followPath(path0, true);
             setPathState(1);
         } else if (pathState == 1) {
-            if (follower.getPose().getY() < 23) {
-                setShooting = true;
-                colorSpinner.on();
-                setPathState(2);
-            }
+            if (!follower.isBusy()) setPathState(2);
         } else if (pathState == 2) {
-            if (!follower.isBusy()) setPathState(3);
+//            if (pathTimer.getElapsedTimeSeconds() >= 0.1) {
+            setShooting = true;
+            colorSpinner.on();
+            setPathState(3);
+//            }
         } else if (pathState == 3) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1.2) {
+            if (pathTimer.getElapsedTimeSeconds() >= 1.5) {
                 setShooting = false;
                 colorSpinner.slowMode();
                 setPathState(11);
             }
         }
-        //to 1 roll
+        //to 3 roll
         else if (pathState == 11) {
             if (!follower.isBusy()) {
                 follower.followPath(path1, true);
@@ -87,46 +81,37 @@ public class Auto1 extends RobotBase {
         } else if (pathState == 12) {
             if (follower.getPose().getX() < -40) setPathState(13);
         } else if (pathState == 13) {
-            if (follower.getPose().getX() > -30) setPathState(14);
-        } else if (pathState == 14) {
-            if (follower.getPose().getY() > 0) {
+            if (follower.getPose().getX() > -20) {
                 setShooting = true;
                 colorSpinner.on();
-                setPathState(15);
+                setPathState(14);
             }
+        } else if (pathState == 14) {
+            if (!follower.isBusy()) setPathState(15);
         } else if (pathState == 15) {
-            if (!follower.isBusy()) setPathState(16);
-        } else if (pathState == 16) {
             if (pathTimer.getElapsedTimeSeconds() >= quickShootTime) {
                 setShooting = false;
                 colorSpinner.slowMode();
                 setPathState(21);
             }
         }
-        //to 2 roll
-        else if (pathState == 21 && time <= 2) {
+        //to corner
+        else if (pathState == 21 && time <= 4) {
             if (!follower.isBusy()) {
-                follower.followPath(pathToGate, true);
+                follower.followPath(pathToTakeBall, true);
                 setPathState(22);
             }
         } else if (pathState == 22) {
-            if (!follower.isBusy()) setPathState(23);
+            if (follower.getPose().getX() < -40) setPathState(23);
         } else if (pathState == 23) {
-            if (pathTimer.getElapsedTimeSeconds() >= 0.5) setPathState(24);
-        } else if (pathState == 24) {
-            if (!follower.isBusy()) {
-                follower.followPath(pathBackGate, true);
-                setPathState(25);
-            }
-        } else if (pathState == 25) {
-            if (follower.getPose().getY() > 0) {
+            if (follower.getPose().getX() > -24) {
                 setShooting = true;
                 colorSpinner.on();
-                setPathState(26);
+                setPathState(24);
             }
-        } else if (pathState == 26) {
-            if (!follower.isBusy()) setPathState(27);
-        } else if (pathState == 27) {
+        } else if (pathState == 24) {
+            if (!follower.isBusy()) setPathState(25);
+        } else if (pathState == 25) {
             if (pathTimer.getElapsedTimeSeconds() >= quickShootTime) {  //shooting time
                 setShooting = false;
                 colorSpinner.slowMode();
@@ -192,7 +177,7 @@ public class Auto1 extends RobotBase {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 //        startingPose = startBluePose;
-        follower.setStartingPose(startBluePose);
+        follower.setStartingPose(startBlueLongPose);
         buildPaths();
     }
 

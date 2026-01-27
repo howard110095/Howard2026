@@ -11,44 +11,37 @@
 //import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 //import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 //
-//import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
+//import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
 //
 //@Configurable
 //@Autonomous(name = "Auto2", group = "Examples")
 //public class Auto2 extends RobotBase {
 //    private Timer pathTimer, actionTimer, opmodeTimer;
-//    private int pathState, temp = 0;
+//    private int pathState, time = 0;
 //    private Path park;
-//    private PathChain path0, path1, path2, path3;
+//    private PathChain path0, path1, pathToTakeBall;
 //
 //    public void buildPaths() {
 //        path0 = follower.pathBuilder()
-//                .addPath(new BezierLine(startBlueLongPose, blueRoll3_2))
-//                .setLinearHeadingInterpolation(startBlueLongPose.getHeading(), blueRoll3_2.getHeading())
+//                .addPath(new BezierLine(startBlueLongPose, blueLongShootingPose))
+//                .setLinearHeadingInterpolation(startBlueLongPose.getHeading(), blueLongShootingPose.getHeading())
+//                .build();
+//
+//        path1 = follower.pathBuilder()
+//                .addPath(new BezierCurve(blueLongShootingPose, blueControl3_2, blueRoll3_2))
+//                .setLinearHeadingInterpolation(blueLongShootingPose.getHeading(), blueRoll3_2.getHeading())
 //                .addPath(new BezierLine(blueRoll3_2, blueLongShootingPose))
 //                .setLinearHeadingInterpolation(blueRoll3_2.getHeading(), blueLongShootingPose.getHeading())
 //                .build();
 //
-//        path1 = follower.pathBuilder()
+//        pathToTakeBall = follower.pathBuilder()
 //                .addPath(new BezierLine(blueLongShootingPose, blueCorner))
 //                .setLinearHeadingInterpolation(blueLongShootingPose.getHeading(), blueCorner.getHeading())
 //                .addPath(new BezierLine(blueCorner, blueLongShootingPose))
 //                .setLinearHeadingInterpolation(blueCorner.getHeading(), blueLongShootingPose.getHeading())
 //                .build();
 //
-////        path2 = follower.pathBuilder()
-////                .addPath(new BezierCurve(shootingBluePose, blueControl2, blueRoll2))
-////                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll2.getHeading())
-////                .addPath(new BezierCurve(blueRoll2, blueControl2, shootingBluePose))
-////                .setLinearHeadingInterpolation(blueRoll2.getHeading(), shootingBluePose.getHeading())
-////                .build();
-////
-////        path3 = follower.pathBuilder()
-////                .addPath(new BezierCurve(shootingBluePose, blueControl3, blueRoll3))
-////                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll3.getHeading())
-////                .addPath(new BezierCurve(blueRoll3, blueControl3, shootingBluePose))
-////                .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
-////                .build();
+//
 ////
 ////        .
 ////        addPath(new BezierCurve(new Point(preloadPose), new Point(15, 36, Point.CARTESIAN), new Point(61, 36.25, Point.CARTESIAN), new Point(59, 26.000, Point.CARTESIAN)))
@@ -63,82 +56,83 @@
 //
 //    public void autonomousPathUpdate() {
 //        if (pathState == 0) {
-//            intake.off();
-//            colorSpinner.on(0.4);
-//            shooter.shooting(2, true);
-//            if(pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(1);
-//        } else if (pathState == 1) {
-//            intake.on();
-//            colorSpinner.on(0.18);
-//            shooter.shooting(2, false);
 //            follower.followPath(path0, true);
-//            setPathState(2);
+//            setPathState(1);
+//        } else if (pathState == 1) {
+//            if (!follower.isBusy()) setPathState(2);
 //        } else if (pathState == 2) {
-//            if (!follower.isBusy()) {
-//                intake.off();
-//                colorSpinner.on(0.4);
-//                shooter.shooting(2, true);
+////            if (pathTimer.getElapsedTimeSeconds() >= 0.1) {
+//                setShooting = true;
+//                colorSpinner.on();
 //                setPathState(3);
-//            }
+////            }
 //        } else if (pathState == 3) {
-//            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(11);
+//            if (pathTimer.getElapsedTimeSeconds() >= 1.5) {
+//                setShooting = false;
+//                colorSpinner.slowMode();
+//                setPathState(11);
+//            }
 //        }
-//        //to 1 roll
-//        else if (pathState == 11 && temp <= 5) {
+//        //to 3 roll
+//        else if (pathState == 11) {
 //            if (!follower.isBusy()) {
-//                intake.on();
-//                shooter.shooting(2, false);
-//                colorSpinner.on(0.18);
 //                follower.followPath(path1, true);
 //                setPathState(12);
 //            }
 //        } else if (pathState == 12) {
-//            if (!follower.isBusy()) {
-//                intake.off();
-//                colorSpinner.on(0.4);
-//                shooter.shooting(2, true);
-//                temp++;
-//                setPathState(13);
-//            }
+//            if (follower.getPose().getX() < -40) setPathState(13);
 //        } else if (pathState == 13) {
-//            if (pathTimer.getElapsedTimeSeconds() >= 1.5) {
-//                setPathState(11);
+//            if (follower.getPose().getX() > -20) {
+//                setShooting = true;
+//                colorSpinner.on();
+//                setPathState(14);
+//            }
+//        } else if (pathState == 14) {
+//            if (!follower.isBusy()) setPathState(15);
+//        } else if (pathState == 15) {
+//            if (pathTimer.getElapsedTimeSeconds() >= quickShootTime) {
+//                setShooting = false;
+//                colorSpinner.slowMode();
+//                setPathState(21);
 //            }
 //        }
-//        //to 2 roll
-////        else if (pathState == 21) {
-////            if (!follower.isBusy()) {
-////                intake.on();
-////                shooter.shooting(2, false);
-////                colorSpinner.on(0.18);
-////                follower.followPath(path2, true);
-////                setPathState(22);
-////            }
-////        } else if (pathState == 22) {
-////            if (!follower.isBusy()) {
-////                intake.off();
-////                colorSpinner.on(0.4);
-////                shooter.shooting(2, true);
-////                setPathState(23);
-////            }
-////
-////        } else if (pathState == 23) {
-////            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(31);
-////        }
-//////        //to 3 roll
+//        //to corner
+//        else if (pathState == 21 && time <= 4) {
+//            if (!follower.isBusy()) {
+//                follower.followPath(pathToTakeBall, true);
+//                setPathState(22);
+//            }
+//        } else if (pathState == 22) {
+//            if (follower.getPose().getX() < -40) setPathState(23);
+//        } else if (pathState == 23) {
+//            if (follower.getPose().getX() > -24) {
+//                setShooting = true;
+//                colorSpinner.on();
+//                setPathState(24);
+//            }
+//        } else if (pathState == 24) {
+//            if (!follower.isBusy()) setPathState(25);
+//        } else if (pathState == 25) {
+//            if (pathTimer.getElapsedTimeSeconds() >= quickShootTime) {  //shooting time
+//                setShooting = false;
+//                colorSpinner.slowMode();
+//                time++;
+//                setPathState(21);
+//            }
+//        }
+//        //to 3 roll
 ////        else if (pathState == 31) {
 ////            if (!follower.isBusy()) {
-////                intake.on();
-////                shooter.shooting(2, false);
-////                colorSpinner.on(0.18);
+////                setShooting = false;
+////                colorSpinner.slowMode();
 ////                follower.followPath(path3, true);
 ////                setPathState(32);
 ////            }
 ////        } else if (pathState == 32) {
 ////            if (!follower.isBusy()) {
 ////                intake.off();
-////                colorSpinner.on(0.4);
-////                shooter.shooting(2, true);
+////                colorSpinner.slowMode();
+////                setShooting = true;
 ////                setPathState(33);
 ////            }
 ////
@@ -157,7 +151,8 @@
 //        follower.update();
 //        autonomousPathUpdate();
 //        //vision
-//        shooter.visionTracking(2);
+//        intake.on();
+//        shooter.shootingPRO(2, setVelocity, setYawDegree, setPitchDegree, setShooting);
 //        // These loop the movements of the robot
 //
 //        telemetry.addData("uVelocity", shooter.limelight.getLatestResult().getTx());
@@ -187,17 +182,10 @@
 //        buildPaths();
 //    }
 //
-//    /**
-//     * This method is called continuously after Init while waiting for "play".
-//     **/
 //    @Override
 //    public void robotInitLoop() {
 //    }
 //
-//    /**
-//     * This method is called once at the start of the OpMode.
-//     * It runs all the setup actions, including building paths and starting the path system
-//     **/
 //    @Override
 //    public void robotStart() {
 //        opmodeTimer.resetTimer();

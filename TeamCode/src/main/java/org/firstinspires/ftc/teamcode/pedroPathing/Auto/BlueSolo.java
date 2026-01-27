@@ -1,21 +1,20 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing.Auto;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.pedropathing.geometry.Pose;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 
 @Configurable
-@Autonomous(name = "Auto", group = "Examples")
-public class Auto extends RobotBase {
+@Autonomous(name = "BlueSolo", group = "Examples")
+public class BlueSolo extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Path park;
@@ -85,9 +84,7 @@ public class Auto extends RobotBase {
                 setPathState(12);
             }
         } else if (pathState == 12) {
-            if (!follower.isBusy()) {
-                setPathState(13);
-            }
+            if (!follower.isBusy())  setPathState(13);
         } else if (pathState == 13) {
             if (pathTimer.getElapsedTimeSeconds() > 1.2) setPathState(14);
         } else if (pathState == 14) {
