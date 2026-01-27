@@ -106,9 +106,11 @@ public class Shooter {
         if (targetVelocity == 0) {  //tracking
             if (result != null && result.isValid()) { //have apriltag, velocity
                 d = 20.0 + ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + limelight.getLatestResult().getTy())));
-                toVelocity = 11.144 * d + 2376.3;
+                toVelocity = 11.144 * d + 2476.3; //2376.3
             } else
-                toVelocity = 11.144 * distance(pipeline) + 2376.3; // no apriltag, velocity formula
+                toVelocity = 11.144 * distance(pipeline) + 2476.3; // no apriltag, velocity formula
+            //2376.3
+//            if (toVelocity > 3550) toVelocity += 80.0;
         }
         double velocity1 = toVelocity / 4600;
         double velocity2 = toVelocity / 4300;
@@ -127,15 +129,16 @@ public class Shooter {
         toYawDegree = turretTargetYaw;
         if (turretTargetYaw == -500) {  //tracking
             double targetDegree;
-            if (dy(pipeline) < 0)
-                targetDegree = (dx(pipeline) >= 0) ? 0 : 180;   // right → 0, left → 180
-            else targetDegree = Math.toDegrees(Math.atan2(dy(pipeline), dx(pipeline)));
+//            if (dy(pipeline) < 0)
+//                targetDegree = (dx(pipeline) >= 0) ? 0 : 180;   // right → 0, left → 180
+//            else
+            targetDegree = Math.toDegrees(Math.atan2(dy(pipeline), dx(pipeline)));
             double heading = Math.toDegrees(follower.getPose().getHeading());
             toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
             if (result != null && result.isValid()) {
                 double deltaDegree = 0;
-                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = -3;
-                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 3;
+                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = 0; //-3
+                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 0; //3
                 toYawDegree -= (result.getTx() - deltaDegree) * 0.35;
             }
         }
@@ -150,16 +153,13 @@ public class Shooter {
         pitchDegree(toPitchDegree);
 
         // shooting or not
-        if (!openShooting) {
+        boolean speedReady = Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1;
+        if (!openShooting && !isAuto) {
             isLastShoot = false;
             shooterU.setPower(0);
             shooterD.setPower(0);
             elevatorOff();
-        } else if (openShooting && isAuto) {
-            shooterU.setPower(shooterU_power);
-            shooterD.setPower(shooterD_power);
-            elevatorUp();
-        } else if (openShooting && isLastShoot) {
+        } else if (openShooting && (isAuto || isLastShoot)) {
             shooterU.setPower(shooterU_power);
             shooterD.setPower(shooterD_power);
             elevatorUp();
@@ -216,13 +216,6 @@ public class Shooter {
         target = clamp(target, -90, 90);
         double pp = 0.5 + target * 0.56 / 180.0;
         pp -= yawDegreeOffset * 0.01;
-////        SpinnerPID.setPID(0.018, 0.08, 0.0008);
-//        double power = SpinnerPID.calculate(getDegree(), target);
-//        power = clamp(power, -0.2, 0.2);
-//        shooterSpinner1.setPower(power);
-//        shooterSpinner2.setPower(power);
-
-
         shooterSpinner1.setPosition(pp);
         shooterSpinner2.setPosition(pp);
     }
@@ -258,7 +251,6 @@ public class Shooter {
 
     public void color(double pwm) {
         pwm = clamp(pwm, 0.0, 1.0);
-//        turretPitchR.setPosition(0.03 * (degree) - 0.71);
         led.setPosition(pwm);
     }
 

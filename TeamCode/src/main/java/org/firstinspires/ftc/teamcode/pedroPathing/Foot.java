@@ -14,29 +14,29 @@ public class Foot {
     }
 
     public void robotUp() {
-           // white
-        leftFoot.setPosition(0.99);
-        rightFoot.setPosition(0.01);
-//           // black
-//        leftFoot.setPosition(0.01);
+//           // white
+//        leftFoot.setPosition(0.99);
 //        rightFoot.setPosition(0.01);
+           // black
+        leftFoot.setPosition(0.01);
+        rightFoot.setPosition(0.01);
     }
 
     public void robotDown() {
-         //white
-        leftFoot.setPosition(0.01);
-        rightFoot.setPosition(0.99);
-//         //black
-//        leftFoot.setPosition(0.99);
+//         //white
+//        leftFoot.setPosition(0.01);
 //        rightFoot.setPosition(0.99);
+         //black
+        leftFoot.setPosition(0.99);
+        rightFoot.setPosition(0.99);
     }
     public void robotDefend() {
          //white
-        leftFoot.setPosition(0.3);
-        rightFoot.setPosition(0.7);
-//         //black
-//        leftFoot.setPosition(0.7);
-//        rightFoot.setPosition(0.7);
+//        leftFoot.setPosition(0.4);
+//        rightFoot.setPosition(0.6);
+         //black
+        leftFoot.setPosition(0.6);
+        rightFoot.setPosition(0.6) ;
     }
 }
 

@@ -12,10 +12,10 @@ import com.pedropathing.geometry.Pose;
 public abstract class Tele extends RobotBase {
     protected abstract int targetAprilTag();
 
-    public boolean driveMode = false;
-    public double hangVelocity = 3500, hangYawDegree = 0, hangPitch = 45;
-    int modeTemp = 0, endTemp = 0, EndGameMode = 0;
-    boolean last1Y = false, last1A = false, last1RB, NormalMode = true;
+    public boolean driveMode = false, lastDriveMode = true;
+    public double hangYawDegree = 0, hangPitch = 45;
+    int EndGameMode = 0, isChangeDriveMode = 1;
+    boolean last1RB = false, NormalMode = true;
 
     @Override
     public void robotInit() {
@@ -57,6 +57,7 @@ public abstract class Tele extends RobotBase {
         if (gamepad1.a) EndGameMode = 0;
         if (gamepad2.y) yawDegreeOffset = 0;
 
+
         if (EndGameMode != 0) {
             if (EndGameMode == 3) foot.robotUp();
             else if (EndGameMode == 2) foot.robotDefend();
@@ -76,14 +77,14 @@ public abstract class Tele extends RobotBase {
             if (NormalMode) AutoTrackingMode();
             else HandMode(); // vision, pinpoint are not work (fool mode)
 
+
             //set shooting constant
-            shooter.shootingPRO(targetAprilTag(), setVelocity, setYawDegree, setPitchDegree, setShooting);
+            shooter.shootingPRO(targetAprilTag() * isChangeDriveMode, setVelocity, setYawDegree, setPitchDegree, setShooting);
         }
 
 
-        if (!last1A && gamepad1.a) NormalMode = !NormalMode;
-        last1A = gamepad1.a;
-
+        if (!last1RB && gamepad1.right_bumper) NormalMode = !NormalMode;
+        last1RB = gamepad1.right_bumper;
 
         // drive
         double axial = -gamepad1.left_stick_y;
@@ -93,12 +94,28 @@ public abstract class Tele extends RobotBase {
         follower.update();
         if (gamepad1.left_stick_button) driveMode = true;
         if (gamepad1.right_stick_button) driveMode = false;
+
+        if (lastDriveMode && !driveMode && targetAprilTag() == 2) {
+            isChangeDriveMode = -1;
+            follower.setX(-follower.getPose().getX());
+            follower.setY(-follower.getPose().getY());
+            follower.setHeading(Math.toRadians(Math.toDegrees(follower.getPose().getHeading()) + 180.0));
+        } else if (!lastDriveMode && driveMode && targetAprilTag() == 2) {
+            isChangeDriveMode = 1;
+            follower.setX(-follower.getPose().getX());
+            follower.setY(-follower.getPose().getY());
+            follower.setHeading(Math.toRadians(Math.toDegrees(follower.getPose().getHeading()) + 180.0));
+        }
+
+        lastDriveMode = driveMode;
         follower.setTeleOpDrive(axial, lateral, yaw * 0.8, driveMode);
 
         telemetry.addData("tx", shooter.limelight.getLatestResult().getTx());
-        telemetry.addData("savedPose", savedPose);
+        telemetry.addData("target velocity", toVelocity);
         telemetry.addData("hangYawDegree", hangYawDegree);
         telemetry.addData("hangPitch", hangPitch);
+        telemetry.addData("dx", shooter.dx(targetAprilTag() * isChangeDriveMode));
+        telemetry.addData("dy", shooter.dy(targetAprilTag() * isChangeDriveMode));
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", Math.toDegrees(follower.getHeading()));

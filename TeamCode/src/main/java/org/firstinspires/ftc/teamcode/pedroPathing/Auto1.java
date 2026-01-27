@@ -17,35 +17,33 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.RobotConstants.*;
 @Autonomous(name = "Auto1", group = "Examples")
 public class Auto1 extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
-    private int pathState;
+    private int pathState, time = 0;
     private Path park;
-    private PathChain path0, path1, path2, path3;
+    private PathChain path0, path1, pathToGate, pathBackGate;
 
     public void buildPaths() {
         path0 = follower.pathBuilder()
-                .addPath(new BezierLine(startBluePose, shootingBluePose))
-                .setLinearHeadingInterpolation(startBluePose.getHeading(), shootingBluePose.getHeading())
+                .addPath(new BezierLine(startBluePose, shootingBlueSeePose))
+                .setLinearHeadingInterpolation(startBluePose.getHeading(), shootingBlueSeePose.getHeading())
                 .build();
 
         path1 = follower.pathBuilder()
-                .addPath(new BezierLine(shootingBluePose, blueRoll1))
-                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll1.getHeading())
-                .addPath(new BezierLine(blueRoll1, shootingBluePose))
-                .setLinearHeadingInterpolation(blueRoll1.getHeading(), shootingBluePose.getHeading())
-                .build();
-
-        path2 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootingBluePose, blueControl2, blueRoll2))
-                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll2.getHeading())
+                .addPath(new BezierCurve(shootingBlueSeePose, blueControl2, blueRoll2))
+                .setLinearHeadingInterpolation(shootingBlueSeePose.getHeading(), blueRoll2.getHeading())
                 .addPath(new BezierCurve(blueRoll2, blueControl2, shootingBluePose))
                 .setLinearHeadingInterpolation(blueRoll2.getHeading(), shootingBluePose.getHeading())
                 .build();
 
-        path3 = follower.pathBuilder()
-                .addPath(new BezierCurve(shootingBluePose, blueControl3, blueRoll3))
-                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueRoll3.getHeading())
-                .addPath(new BezierCurve(blueRoll3, blueControl3, shootingBluePose))
-                .setLinearHeadingInterpolation(blueRoll3.getHeading(), shootingBluePose.getHeading())
+        pathToGate = follower.pathBuilder()
+                .addPath(new BezierCurve(shootingBluePose, blueToGateControl2, blueOpenGate))
+                .setLinearHeadingInterpolation(shootingBluePose.getHeading(), blueOpenGate.getHeading())
+                .addPath(new BezierLine(blueOpenGate, blueCatchFromGate))
+                .setLinearHeadingInterpolation(blueOpenGate.getHeading(), blueCatchFromGate.getHeading())
+                .build();
+
+        pathBackGate = follower.pathBuilder()
+                .addPath(new BezierCurve(blueCatchFromGate, blueBackFromGateControl, shootingBluePose))
+                .setLinearHeadingInterpolation(blueCatchFromGate.getHeading(), shootingBluePose.getHeading())
                 .build();
 //
 //        .
@@ -66,71 +64,95 @@ public class Auto1 extends RobotBase {
             follower.followPath(path0, true);
             setPathState(1);
         } else if (pathState == 1) {
-            if (follower.getPose().getY() < 35) {
+            if (follower.getPose().getY() < 23) {
                 setShooting = true;
+                colorSpinner.on();
                 setPathState(2);
             }
         } else if (pathState == 2) {
-            if (!follower.isBusy()) {
-                setPathState(3);
-            }
+            if (!follower.isBusy()) setPathState(3);
         } else if (pathState == 3) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1) setPathState(11);
+            if (pathTimer.getElapsedTimeSeconds() >= 1.2) {
+                setShooting = false;
+                colorSpinner.slowMode();
+                setPathState(11);
+            }
         }
         //to 1 roll
         else if (pathState == 11) {
             if (!follower.isBusy()) {
-                setShooting = false;
-                colorSpinner.slowMode();
                 follower.followPath(path1, true);
                 setPathState(12);
             }
         } else if (pathState == 12) {
-            if (!follower.isBusy()) {
-                colorSpinner.slowMode();
-                setShooting = true;
-                setPathState(13);
-            }
+            if (follower.getPose().getX() < -40) setPathState(13);
         } else if (pathState == 13) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(21);
-        }
-        //to 2 roll
-        else if (pathState == 21) {
-            if (!follower.isBusy()) {
+            if (follower.getPose().getX() > -30) setPathState(14);
+        } else if (pathState == 14) {
+            if (follower.getPose().getY() > 0) {
+                setShooting = true;
+                colorSpinner.on();
+                setPathState(15);
+            }
+        } else if (pathState == 15) {
+            if (!follower.isBusy()) setPathState(16);
+        } else if (pathState == 16) {
+            if (pathTimer.getElapsedTimeSeconds() >= quickShootTime) {
                 setShooting = false;
                 colorSpinner.slowMode();
-                follower.followPath(path2, true);
+                setPathState(21);
+            }
+        }
+        //to 2 roll
+        else if (pathState == 21 && time <= 2) {
+            if (!follower.isBusy()) {
+                follower.followPath(pathToGate, true);
                 setPathState(22);
             }
         } else if (pathState == 22) {
-            if (!follower.isBusy()) {
-                colorSpinner.slowMode();
-                setShooting = true;
-                setPathState(23);
-            }
-
+            if (!follower.isBusy()) setPathState(23);
         } else if (pathState == 23) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(31);
-        }
-//        //to 3 roll
-        else if (pathState == 31) {
+            if (pathTimer.getElapsedTimeSeconds() >= 0.5) setPathState(24);
+        } else if (pathState == 24) {
             if (!follower.isBusy()) {
+                follower.followPath(pathBackGate, true);
+                setPathState(25);
+            }
+        } else if (pathState == 25) {
+            if (follower.getPose().getY() > 0) {
+                setShooting = true;
+                colorSpinner.on();
+                setPathState(26);
+            }
+        } else if (pathState == 26) {
+            if (!follower.isBusy()) setPathState(27);
+        } else if (pathState == 27) {
+            if (pathTimer.getElapsedTimeSeconds() >= quickShootTime) {  //shooting time
                 setShooting = false;
                 colorSpinner.slowMode();
-                follower.followPath(path3, true);
-                setPathState(32);
+                time++;
+                setPathState(21);
             }
-        } else if (pathState == 32) {
-            if (!follower.isBusy()) {
-                intake.off();
-                colorSpinner.slowMode();
-                setShooting = true;
-                setPathState(33);
-            }
-
-        } else if (pathState == 33) {
-            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(34);
         }
+        //to 3 roll
+//        else if (pathState == 31) {
+//            if (!follower.isBusy()) {
+//                setShooting = false;
+//                colorSpinner.slowMode();
+//                follower.followPath(path3, true);
+//                setPathState(32);
+//            }
+//        } else if (pathState == 32) {
+//            if (!follower.isBusy()) {
+//                intake.off();
+//                colorSpinner.slowMode();
+//                setShooting = true;
+//                setPathState(33);
+//            }
+//
+//        } else if (pathState == 33) {
+//            if (pathTimer.getElapsedTimeSeconds() >= 1.5) setPathState(34);
+//        }
     }
 
     public void setPathState(int pState) {
