@@ -9,12 +9,13 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.R_P2_shoot;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 
 @Configurable
-@Autonomous(name = "BlueP2", group = "Examples")
-public class BlueP2 extends RobotBase {
+@Autonomous(name = "RedP2", group = "Examples")
+public class RedP2 extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState, time = 0;
     private Path park;
@@ -22,22 +23,22 @@ public class BlueP2 extends RobotBase {
 
     public void buildPaths() {
         path0 = follower.pathBuilder()
-                .addPath(new BezierLine(B_P2_start, B_P2_shoot))
-                .setLinearHeadingInterpolation(B_P2_start.getHeading(), B_P2_shoot.getHeading())
+                .addPath(new BezierLine(R_P2_start, R_P2_shoot))
+                .setLinearHeadingInterpolation(R_P2_start.getHeading(), R_P2_shoot.getHeading())
                 .build();
 
         path1 = follower.pathBuilder()
-                .addPath(new BezierCurve(B_P2_shoot, B_P2_R3_control, B_P2_R3_end))
-                .setLinearHeadingInterpolation(B_P2_shoot.getHeading(), B_P2_R3_end.getHeading())
-                .addPath(new BezierLine(B_P2_R3_end, B_P2_shoot))
-                .setLinearHeadingInterpolation(B_P2_R3_end.getHeading(), B_P2_shoot.getHeading())
+                .addPath(new BezierCurve(R_P2_shoot, R_P2_R3_control, R_P2_R3_end))
+                .setLinearHeadingInterpolation(R_P2_shoot.getHeading(), R_P2_R3_end.getHeading())
+                .addPath(new BezierLine(R_P2_R3_end, R_P2_shoot))
+                .setLinearHeadingInterpolation(R_P2_R3_end.getHeading(),R_P2_shoot.getHeading())
                 .build();
 
         pathToTakeBall = follower.pathBuilder()
-                .addPath(new BezierLine(B_P2_shoot, B_P2_corner))
-                .setLinearHeadingInterpolation(B_P2_shoot.getHeading(), B_P2_corner.getHeading())
-                .addPath(new BezierLine(B_P2_corner, B_P2_shoot))
-                .setLinearHeadingInterpolation(B_P2_corner.getHeading(), B_P2_shoot.getHeading())
+                .addPath(new BezierLine(R_P2_shoot, R_P2_corner))
+                .setLinearHeadingInterpolation(R_P2_shoot.getHeading(), R_P2_corner.getHeading())
+                .addPath(new BezierLine(R_P2_corner, R_P2_shoot))
+                .setLinearHeadingInterpolation(R_P2_corner.getHeading(), R_P2_shoot.getHeading())
                 .build();
 
 
@@ -79,9 +80,9 @@ public class BlueP2 extends RobotBase {
                 setPathState(12);
             }
         } else if (pathState == 12) {
-            if (follower.getPose().getX() < -40) setPathState(13);
+            if (follower.getPose().getX() > 40) setPathState(13);
         } else if (pathState == 13) {
-            if (follower.getPose().getX() > -20) {
+            if (follower.getPose().getX() < 20) {
                 setShooting = true;
                 colorSpinner.on();
                 setPathState(14);
@@ -102,9 +103,9 @@ public class BlueP2 extends RobotBase {
                 setPathState(22);
             }
         } else if (pathState == 22) {
-            if (follower.getPose().getX() < -40) setPathState(23);
+            if (follower.getPose().getX() > 40) setPathState(23);
         } else if (pathState == 23) {
-            if (follower.getPose().getX() > -24) {
+            if (follower.getPose().getX() < 24) {
                 setShooting = true;
                 colorSpinner.on();
                 setPathState(24);
@@ -177,7 +178,7 @@ public class BlueP2 extends RobotBase {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 //        startingPose = startBluePose;
-        follower.setStartingPose(B_P2_start);
+        follower.setStartingPose(R_P2_start);
         buildPaths();
     }
 

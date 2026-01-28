@@ -38,7 +38,7 @@ public abstract class Tele extends RobotBase {
 
     @Override
     public void robotLoop() {
-        //InitPose();
+        InitPose();
         if (gamepad1.dpad_up) {
 //            follower.update();
             follower.setPose(InitCenter);
@@ -128,24 +128,33 @@ public abstract class Tele extends RobotBase {
     }
 
     public void InitPose() {
-        if (targetAprilTag() == 2 && !driveMode) {
+        if (targetAprilTag() == 2 && !driveMode) { //no head
             if (gamepad2.dpad_up)
-                follower.setPose(new Pose(39, -63, Math.toRadians(270))); //blue area
+                follower.setPose(new Pose(InitUpX, -InitUpY, Math.toRadians(270))); //blue area
             if (gamepad2.dpad_right)
-                follower.setPose(new Pose(-39, -63, Math.toRadians(270))); //red area
+                follower.setPose(new Pose(-InitUpX, -InitUpY, Math.toRadians(270))); //red area
             if (gamepad2.dpad_left)
-                follower.setPose(new Pose(63, 63, Math.toRadians(0))); //red human
+                follower.setPose(new Pose(InitCornerX, InitCornerY, Math.toRadians(0))); //red human
             if (gamepad2.dpad_down)
-                follower.setPose(new Pose(-63, 63, Math.toRadians(180))); //blue human
+                follower.setPose(new Pose(-InitCornerX, InitCornerY, Math.toRadians(180))); //blue human
+        } else if (targetAprilTag() == 2 && driveMode) { //have head
+            if (gamepad2.dpad_up)
+                follower.setPose(new Pose(-InitUpX, InitUpY, Math.toRadians(90))); //blue area
+            if (gamepad2.dpad_right)
+                follower.setPose(new Pose(InitUpX, InitUpY, Math.toRadians(90))); //red area
+            if (gamepad2.dpad_left)
+                follower.setPose(new Pose(-InitCornerX, -InitCornerY, Math.toRadians(180))); //red human
+            if (gamepad2.dpad_down)
+                follower.setPose(new Pose(InitCornerX, -InitCornerY, Math.toRadians(0))); //blue human
         } else {
             if (gamepad2.dpad_up)
-                follower.setPose(new Pose(39, 63, Math.toRadians(90))); //red area
+                follower.setPose(new Pose(InitUpX, InitUpY, Math.toRadians(90))); //red area
             if (gamepad2.dpad_right)
-                follower.setPose(new Pose(-39, 63, Math.toRadians(90))); //blue area
+                follower.setPose(new Pose(InitCornerX, -InitCornerY, Math.toRadians(0))); //blue human
             if (gamepad2.dpad_left)
-                follower.setPose(new Pose(63, -63, Math.toRadians(0))); //blue human
+                follower.setPose(new Pose(-InitUpX, InitUpY, Math.toRadians(90))); //blue area
             if (gamepad2.dpad_down)
-                follower.setPose(new Pose(-63, -63, Math.toRadians(180))); //red human
+                follower.setPose(new Pose(-InitCornerX, -InitCornerY, Math.toRadians(180))); //red human
         }
     }
 

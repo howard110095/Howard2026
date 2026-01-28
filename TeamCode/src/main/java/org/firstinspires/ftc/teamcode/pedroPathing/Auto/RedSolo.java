@@ -9,12 +9,13 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.R_P1_shoot;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 
 @Configurable
-@Autonomous(name = "BlueSolo", group = "Examples")
-public class BlueSolo extends RobotBase {
+@Autonomous(name = "RedSolo", group = "Examples")
+public class RedSolo extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Path park;
@@ -23,37 +24,37 @@ public class BlueSolo extends RobotBase {
 
     public void buildPaths() {
         path0 = follower.pathBuilder()
-                .addPath(new BezierLine(B_P1_start, B_P1_seeAprilTag))
-                .setLinearHeadingInterpolation(B_P1_start.getHeading(), B_P1_seeAprilTag.getHeading())
+                .addPath(new BezierLine(R_P1_start, R_P1_seeAprilTag))
+                .setLinearHeadingInterpolation(R_P1_start.getHeading(), R_P1_seeAprilTag.getHeading())
                 .build();
 
         path1_go = follower.pathBuilder()
-                .addPath(new BezierLine(B_P1_seeAprilTag, B_P1_R1_end))
-                .setLinearHeadingInterpolation(B_P1_seeAprilTag.getHeading(), B_P1_R1_end.getHeading())
+                .addPath(new BezierLine(R_P1_seeAprilTag, R_P1_R1_end))
+                .setLinearHeadingInterpolation(R_P1_seeAprilTag.getHeading(), R_P1_R1_end.getHeading())
                 .build();
 
         path1_back = follower.pathBuilder()
-                .addPath(new BezierLine(B_P1_R1_end, B_P1_shoot))
-                .setLinearHeadingInterpolation(B_P1_R1_end.getHeading(), B_P1_shoot.getHeading())
+                .addPath(new BezierLine(R_P1_R1_end,R_P1_shoot))
+                .setLinearHeadingInterpolation(R_P1_R1_end.getHeading(), R_P1_shoot.getHeading())
                 .build();
 
         path2 = follower.pathBuilder()
-                .addPath(new BezierCurve(B_P1_shoot, B_P1_R2_control, B_P1_R2_end))
-                .setLinearHeadingInterpolation(B_P1_shoot.getHeading(), B_P1_R2_end.getHeading())
-                .addPath(new BezierCurve(B_P1_R2_end, B_P1_R2_control, B_P1_shoot))
-                .setLinearHeadingInterpolation(B_P1_R2_end.getHeading(), B_P1_shoot.getHeading())
+                .addPath(new BezierCurve(R_P1_shoot, R_P1_R2_control, R_P1_R2_end))
+                .setLinearHeadingInterpolation(R_P1_shoot.getHeading(),R_P1_R2_end.getHeading())
+                .addPath(new BezierCurve(R_P1_R2_end, R_P1_R2_control, R_P1_shoot))
+                .setLinearHeadingInterpolation(R_P1_R2_end.getHeading(), R_P1_shoot.getHeading())
                 .build();
 
         path3 = follower.pathBuilder()
-                .addPath(new BezierCurve(B_P1_shoot, B_P1_R3_control, B_P1_R3_end))
-                .setLinearHeadingInterpolation(B_P1_shoot.getHeading(), B_P1_R3_end.getHeading())
-                .addPath(new BezierLine(B_P1_R3_end, B_P1_shoot))
-                .setLinearHeadingInterpolation(B_P1_R3_end.getHeading(), B_P1_shoot.getHeading())
+                .addPath(new BezierCurve(R_P1_shoot, R_P1_R3_control, R_P1_R3_end))
+                .setLinearHeadingInterpolation(R_P1_shoot.getHeading(),R_P1_R3_end.getHeading())
+                .addPath(new BezierLine(R_P1_R3_end, R_P1_shoot))
+                .setLinearHeadingInterpolation(R_P1_R3_end.getHeading(),R_P1_shoot.getHeading())
                 .build();
 
         path4 = follower.pathBuilder()
-                .addPath(new BezierLine(B_P1_shoot, B_P1_stop))
-                .setLinearHeadingInterpolation(B_P1_shoot.getHeading(), B_P1_stop.getHeading())
+                .addPath(new BezierLine(R_P1_shoot,R_P1_stop))
+                .setLinearHeadingInterpolation(R_P1_shoot.getHeading(), R_P1_stop.getHeading())
                 .build();
     }
 
@@ -94,7 +95,7 @@ public class BlueSolo extends RobotBase {
             follower.followPath(path1_back, true);
             setPathState(15);
         } else if (pathState == 15) {
-            if (follower.getPose().getX() > -40) {
+            if (follower.getPose().getX() < 40) {
                 setPathState(16);
             }
         } else if (pathState == 16) {
@@ -125,9 +126,9 @@ public class BlueSolo extends RobotBase {
                 setPathState(22);
             }
         } else if (pathState == 22) {
-            if (follower.getPose().getX() < -53) setPathState(23);
+            if (follower.getPose().getX() > 53) setPathState(23);
         } else if (pathState == 23) {
-            if (follower.getPose().getX() > -50) {
+            if (follower.getPose().getX() < 50) {
                 spinDETECT = true;
                 setPathState(24);
             }
@@ -159,9 +160,9 @@ public class BlueSolo extends RobotBase {
                 setPathState(32);
             }
         } else if (pathState == 32) {
-            if (follower.getPose().getX() < -53) setPathState(33);
+            if (follower.getPose().getX() > 53) setPathState(33);
         } else if (pathState == 33) {
-            if (follower.getPose().getX() > -50) {
+            if (follower.getPose().getX() < 50) {
                 spinDETECT = true;
                 setPathState(34);
             }
@@ -235,7 +236,7 @@ public class BlueSolo extends RobotBase {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 //        startingPose = startBluePose;
-        follower.setStartingPose(B_P1_start);
+        follower.setStartingPose(R_P1_start);
         buildPaths();
 
         setAprilTagMode = 2;
