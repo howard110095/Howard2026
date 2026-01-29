@@ -39,26 +39,15 @@ public abstract class Tele extends RobotBase {
     @Override
     public void robotLoop() {
         InitPose();
-        if (gamepad1.dpad_up) {
-//            follower.update();
-            follower.setPose(InitCenter);
-        }
-        if (gamepad1.dpad_left) {
-//            follower.update();
-            follower.setPose(InitBlueCorner);
-        }
-        if (gamepad1.dpad_right) {
-//            follower.update();
-            follower.setPose(InitRedCorner);
-        }
-
+        if (gamepad1.dpad_up) follower.setPose(InitCenter);
+        if (gamepad1.dpad_left) follower.setPose(InitBlueCorner);
+        if (gamepad1.dpad_right) follower.setPose(InitRedCorner);
 
         if (gamepad1.y) EndGameMode = 3;
         if (gamepad1.b) EndGameMode = 2;
         if (gamepad1.x) EndGameMode = 1;
         if (gamepad1.a) EndGameMode = 0;
         if (gamepad2.y) yawDegreeOffset = 0;
-
 
         if (EndGameMode != 0) {
             if (EndGameMode == 3) foot.robotUp();
@@ -78,7 +67,6 @@ public abstract class Tele extends RobotBase {
 
             if (NormalMode) AutoTrackingMode();
             else HandMode(); // vision, pinpoint are not work (fool mode)
-
 
             //set shooting constant
             shooter.shootingPRO(targetAprilTag() * isChangeDriveMode, setVelocity, setYawDegree, setPitchDegree, setShooting);
@@ -113,11 +101,8 @@ public abstract class Tele extends RobotBase {
         follower.setTeleOpDrive(axial, lateral, yaw * 0.8, driveMode);
 
         telemetry.addData("tx", shooter.limelight.getLatestResult().getTx());
-        telemetry.addData("target velocity", toVelocity);
-        telemetry.addData("hangYawDegree", hangYawDegree);
-        telemetry.addData("hangPitch", hangPitch);
-        telemetry.addData("dx", shooter.dx(targetAprilTag() * isChangeDriveMode));
-        telemetry.addData("dy", shooter.dy(targetAprilTag() * isChangeDriveMode));
+        telemetry.addData("shooter Up velocity", shooter.shooterU.getVelocity() / 28.0 * 60.0);
+        telemetry.addData("shooter Down velocity", shooter.shooterD.getVelocity() / 28.0 * 60.0);
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", Math.toDegrees(follower.getHeading()));

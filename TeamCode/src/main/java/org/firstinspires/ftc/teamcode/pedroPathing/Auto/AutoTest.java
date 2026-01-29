@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.Auto;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.draw;
+
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
@@ -14,43 +18,37 @@ public class AutoTest extends RobotBase {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
     private Path park;
-    private PathChain path0, path00;
+    private PathChain front, back;
+    private Pose start = new Pose(0, 0, Math.toRadians(90));
+    private Pose end = new Pose(0, 24, Math.toRadians(90));
 
     public void buildPaths() {
-//        path0 = follower.pathBuilder()
-//                .addPath(new BezierLine(s0_0, s0_1))
-//                .setLinearHeadingInterpolation(s0_0.getHeading(), s0_1.getHeading())
-//                .build();
-//
-//        path00 = follower.pathBuilder()
-//                .addPath(new BezierLine(follower.getPose(), s0_0))
-//                .setLinearHeadingInterpolation(follower.getPose().getHeading(), s0_0.getHeading())
-//                .build();
+        front = follower.pathBuilder()
+                .addPath(new BezierLine(start, end))
+                .setLinearHeadingInterpolation(start.getHeading(), end.getHeading())
+                .build();
 
-
+        back = follower.pathBuilder()
+                .addPath(new BezierLine(end, start))
+                .setLinearHeadingInterpolation(end.getHeading(), start.getHeading())
+                .build();
     }
 
     public void autonomousPathUpdate() {
         if (pathState == 0) {
-            follower.followPath(path0, true);
+            follower.followPath(front, true);
             setPathState(1);
         } else if (pathState == 1) {
-            if (!follower.isBusy() || pathTimer.getElapsedTimeSeconds() > 1.25) {
-                if (pathTimer.getElapsedTimeSeconds() > 1.25) {
-                    follower.breakFollowing();
-                }
-                setPathState(2);
-            }
+            if (!follower.isBusy()) setPathState(2);
         } else if (pathState == 2) {
-            if (!follower.isBusy()) {
-                follower.followPath(path00, true);
-                setPathState(3);
-            }
+            if (pathTimer.getElapsedTimeSeconds() > 0.5) setPathState(3);
         } else if (pathState == 3) {
-            if (!follower.isBusy()) {
-                follower.breakFollowing();
-                setPathState(-1);
-            }
+            follower.followPath(back, true);
+            setPathState(4);
+        }else if (pathState == 4) {
+            if (!follower.isBusy()) setPathState(5);
+        } else if (pathState == 5) {
+            if (pathTimer.getElapsedTimeSeconds() > 0.5) setPathState(0);
         }
 
 
@@ -63,6 +61,7 @@ public class AutoTest extends RobotBase {
 
     @Override
     public void robotLoop() {
+
         follower.update();
         autonomousPathUpdate();
         // Feedback to Driver Hub
@@ -71,6 +70,14 @@ public class AutoTest extends RobotBase {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
+
+        telemetryM.debug("x:" + follower.getPose().getX());
+        telemetryM.debug("y:" + follower.getPose().getY());
+        telemetryM.debug("heading:" + follower.getPose().getHeading());
+        telemetryM.debug("total heading:" + follower.getTotalHeading());
+        telemetryM.update(telemetry);
+
+        draw();
     }
 
     /**
@@ -82,7 +89,7 @@ public class AutoTest extends RobotBase {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 //        startingPose = startBluePose;
-//        follower.setStartingPose(s0_0);
+        follower.setStartingPose(start);
         buildPaths();
     }
 

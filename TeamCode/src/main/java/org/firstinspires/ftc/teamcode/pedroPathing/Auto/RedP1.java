@@ -184,7 +184,7 @@ public class RedP1 extends RobotBase {
         autonomousPathUpdate();
         //vision
         intake.on();
-        shooter.shootingPRO(2, setVelocity, setYawDegree, setPitchDegree, setShooting);
+        shooter.shootingPRO(0, setVelocity, setYawDegree, setPitchDegree, setShooting);
         // These loop the movements of the robot
 
         telemetry.addData("uVelocity", shooter.limelight.getLatestResult().getTx());

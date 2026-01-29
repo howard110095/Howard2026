@@ -133,9 +133,9 @@ public class Shooter {
             toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
             if (result != null && result.isValid()) {
                 double deltaDegree = 0;
-                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = 0; //-3
-                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 0; //3
-                toYawDegree -= (result.getTx() - deltaDegree) * 0.35;
+//                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = 0; //-3
+//                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 0; //3
+                toYawDegree -= (result.getTx() - deltaDegree) * 0.5;
             }
         }
         toDegree(toYawDegree);
