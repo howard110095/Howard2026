@@ -25,9 +25,9 @@ public abstract class Tele extends RobotBase {
     private Pose parkingR2 = new Pose(36, -36, Math.toRadians(270));
     private PathChain tracking;
     private Timer TeleTimer;
-    public double hangYawDegree = 0, hangPitch = 45;
+    public double hangYawDegree = 0, hangPitch = 48;
     int EndGameMode = 0;
-    boolean last1RB = false, NormalMode = true;
+    boolean last2B = false, NormalMode = true;
 
     @Override
     public void robotInit() {
@@ -88,8 +88,8 @@ public abstract class Tele extends RobotBase {
             shooter.shootingPRO(targetAprilTag(), setVelocity, setYawDegree, setPitchDegree, setShooting);
         }
 
-        if (!last1RB && gamepad1.right_bumper) NormalMode = !NormalMode;
-        last1RB = gamepad1.right_bumper;
+        if (!last2B && gamepad2.b) NormalMode = !NormalMode;
+        last2B = gamepad2.b;
 
         // drive
         double axial = -gamepad1.left_stick_y;
@@ -97,7 +97,7 @@ public abstract class Tele extends RobotBase {
         double yaw = -gamepad1.right_stick_x;
 
         follower.update();
-        follower.setTeleOpDrive(axial, lateral, yaw * 0.8, false);
+        follower.setTeleOpDrive(axial, lateral, yaw * 0.8, !NormalMode);
 
 //        if (gamepad1.left_trigger > 0.3) {
 //            teleopStarted = false;
@@ -195,12 +195,9 @@ public abstract class Tele extends RobotBase {
         hangYawDegree -= gamepad2.right_stick_x * 0.8; // adjust turret yaw degree
         hangPitch -= gamepad2.left_stick_y * 0.8; // adjust pitch degree
 
-        hangYawDegree = clamp(hangYawDegree, -90.0, 90.0);
-        hangPitch = clamp(hangPitch, 24.0, 49.0);
-
-        setVelocity = 3500;
-        setYawDegree = hangYawDegree;
-        setPitchDegree = hangPitch;
+        setVelocity = 3200;
+        setYawDegree =  clamp(hangYawDegree, -90.0, 90.0);;
+        setPitchDegree = clamp(hangPitch, 24.0, 49.0);
         telemetry.addData("Mode", "Hand Mode");
     }
 }

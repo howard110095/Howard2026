@@ -188,6 +188,7 @@ public class BlueP2 extends RobotBase {
     @Override
     public void robotStart() {
         isAuto = true;
+        foot.robotDown();
         opmodeTimer.resetTimer();
         setPathState(0);
     }

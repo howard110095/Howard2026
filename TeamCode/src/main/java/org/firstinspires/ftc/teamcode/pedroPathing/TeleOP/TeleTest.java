@@ -2,6 +2,11 @@ package org.firstinspires.ftc.teamcode.pedroPathing.TeleOP;
 
 import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.setPitchDegree;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.setShooting;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.setVelocity;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.setYawDegree;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,18 +15,17 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 @Configurable
 @TeleOp(name = "TeleTest", group = "Linear OpMode")
 public class TeleTest extends RobotBase {
-    public static double position = 0.5, rpm = 2500, setColor = 0;
+    public static double target = 3300, uP = 0, uI = 0, uD = 0, dP = 0, dI = 0, dD = 0;
 
 
     @Override
     public void robotInit() {
-        if (savedPose != null) startingPose = savedPose;
         follower.setStartingPose(startingPose);
     }
 
     @Override
     protected void robotInitLoop() {
-        telemetry.addData("SavedPose", (savedPose != null) ? "YES" : "NO");
+//        telemetry.addData("SavedPose", (savedPose != null) ? "YES" : "NO");
     }
 
     @Override
@@ -31,8 +35,14 @@ public class TeleTest extends RobotBase {
 
     @Override
     public void robotLoop() {
-        foot.rightFoot.setPosition(position);
-        foot.leftFoot.setPosition(position);
+        intake.on();
+        colorSpinner.slowMode();
+        shooter.elevatorUp();
+
+//        shooter.shooterU.setPower(1);
+//        shooter.shooterD.setPower(1);
+
+        shooter.shootingPRO(2, target, setYawDegree, setPitchDegree, true);
 
         // drive
         double axial = -gamepad1.left_stick_y;
@@ -42,11 +52,10 @@ public class TeleTest extends RobotBase {
         follower.setTeleOpDrive(axial, lateral, -yaw * 0.8, true);
 
 
-//        telemetry.addData("target", t);
-//        telemetry.addData("get degree", shooter.getDegree());
-        telemetry.addData("getPose", shooter.getPose());
-        telemetry.addData("getDegree", shooter.getDegree());
-//        telemetry.addData("ty", shooter.limelight.getLatestResult().getTy());
+//        telemetry.addData("getPose", shooter.getPose());
+//        telemetry.addData("getDegree", shooter.getDegree());
+        telemetry.addData("up velocity rpm", shooter.shooterU.getVelocity() / 28.0 * 60.0);
+        telemetry.addData("down velocity rpm", shooter.shooterD.getVelocity() / 28.0 * 60.0);
         telemetry.addData("distance", shooter.distance(0));
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
@@ -55,23 +64,26 @@ public class TeleTest extends RobotBase {
         telemetry.addData("down velocity ", shooter.shooterD.getVelocity() / 28 * 60);
         telemetry.update();
 
-        telemetryM.addData("setColor", setColor);
-
-
-
-        telemetryM.addData("get now", shooter.getDegree());
-        telemetryM.addData("target", rpm);
+//        telemetryM.addData("setColor", setColor);
+//        telemetryM.addData("get now", shooter.getDegree());
+        telemetryM.addData("distance", shooter.distance(0));
+        telemetryM.addData("Up Power", shooter.shooterU.getPower());
+        telemetryM.addData("Down Power", shooter.shooterD.getPower());
+        telemetryM.addData("target", target);
         telemetryM.addData("up velocity rpm", shooter.shooterU.getVelocity() / 28.0 * 60.0);
         telemetryM.addData("down velocity rpm", shooter.shooterD.getVelocity() / 28.0 * 60.0);
-        telemetryM.addData("p", shooter.SpinnerPID.getP());
-        telemetryM.addData("i", shooter.SpinnerPID.getI());
-        telemetryM.addData("d", shooter.SpinnerPID.getD());
+        telemetryM.addData("p", shooter.ShooterUPID.getP());
+        telemetryM.addData("i", shooter.ShooterUPID.getI());
+        telemetryM.addData("d", shooter.ShooterUPID.getD());
+        telemetryM.addData(" p", shooter.ShooterDPID.getP());
+        telemetryM.addData(" i", shooter.ShooterDPID.getI());
+        telemetryM.addData(" d", shooter.ShooterDPID.getD());
 //        telemetryM.addData("target", t);
 //        telemetryM.addData("get degree", shooter.getDegree());
 //        telemetryM.addData("getLatestResult", shooter.limelight.getLatestResult().getTx());
-//        telemetryM.addData("X", follower.getPose().getX());
-//        telemetryM.addData("Y", follower.getPose().getY());
-//        telemetryM.addData("Heading", Math.toDegrees(follower.getHeading()));
+        telemetryM.addData("X", follower.getPose().getX());
+        telemetryM.addData("Y", follower.getPose().getY());
+        telemetryM.addData("Heading", Math.toDegrees(follower.getHeading()));
         telemetryM.update();
     }
 

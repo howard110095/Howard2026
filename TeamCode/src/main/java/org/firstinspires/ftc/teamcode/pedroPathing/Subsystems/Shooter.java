@@ -90,6 +90,21 @@ public class Shooter {
         return Math.pow(dx(pipe) * dx(pipe) + dy(pipe) * dy(pipe), 0.5);
     }
 
+    public void shooterPID(double targetVelocity, double uP, double uI, double uD, double dP, double dI, double dD) {
+        double velocity1 = targetVelocity / MaxUpVelocity;
+        double velocity2 = targetVelocity / MaxDownVelocity;
+        uVelocity = ((shooterU.getVelocity() / 28) * 60) / MaxUpVelocity;
+        dVelocity = ((shooterD.getVelocity() / 28) * 60) / MaxDownVelocity;
+        ShooterUPID.setPID(uP, uI, uD); // setting PID
+        shooterU_power = ShooterUPID.calculate(uVelocity, velocity1); // calculate output power
+        ShooterDPID.setPID(dP, dI, dD); // setting PID
+        shooterD_power = ShooterDPID.calculate(dVelocity, velocity2); // calculate output power
+        shooterU_power = clamp(shooterU_power + velocity1, -1, 1.0); // setting in correct range
+        shooterD_power = clamp(shooterD_power + velocity2, -1, 1.0);
+        shooterU.setPower(shooterU_power);
+        shooterD.setPower(shooterD_power);
+    }
+
     public void shootingPRO(int pipeline, double targetVelocity, double turretTargetYaw, double turretTargetPitch, boolean openShooting) {
         // setting pipe line
         limelight.pipelineSwitch(Math.abs(pipeline));
@@ -107,10 +122,10 @@ public class Shooter {
             else toVelocity = 11.144 * targetDistance + 2376.3;
 
         }
-        double velocity1 = toVelocity / 4600;
-        double velocity2 = toVelocity / 4300;
-        uVelocity = ((shooterU.getVelocity() / 28) * 60) / 4600;
-        dVelocity = ((shooterD.getVelocity() / 28) * 60) / 4300;
+        double velocity1 = toVelocity / MaxUpVelocity;
+        double velocity2 = toVelocity / MaxDownVelocity;
+        uVelocity = ((shooterU.getVelocity() / 28) * 60) / MaxUpVelocity;
+        dVelocity = ((shooterD.getVelocity() / 28) * 60) / MaxDownVelocity;
         ShooterUPID.setPID(ukP, ukI, ukD); // setting PID
         shooterU_power = ShooterUPID.calculate(uVelocity, velocity1); // calculate output power
         ShooterDPID.setPID(dkP, dkI, dkD); // setting PID
@@ -139,37 +154,39 @@ public class Shooter {
         // turret target pitch degree
         toPitchDegree = turretTargetPitch;
         if (turretTargetPitch == 0) {
-            if (targetDistance > 100) toPitchDegree = 48;
-            else toPitchDegree = 0.3472 * targetDistance + 12.679;
+            toPitchDegree = 0.1602 * targetDistance + 20.7;
         }
         pitchDegree(toPitchDegree);
 
+
         // shooting or not
 //        boolean speedReady = Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1;
-        if (!openShooting && !isAuto) {
-            isLastShoot = false;
-            shooterU.setPower(0);
-            shooterD.setPower(0);
-            elevatorOff();
-        } else if (!openShooting && isAuto) {
-            shooterU.setPower(shooterU_power);
-            shooterD.setPower(shooterD_power);
-            elevatorOff();
-        } else if (openShooting && (isAuto || isLastShoot)) {
-            shooterU.setPower(shooterU_power);
-            shooterD.setPower(shooterD_power);
-            elevatorUp();
-        } else if (openShooting && !isAuto && Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1) {
-            isLastShoot = true;
-            shooterU.setPower(shooterU_power);
-            shooterD.setPower(shooterD_power);
-            elevatorUp();
-        } else {
-            shooterU.setPower(shooterU_power);
-            shooterD.setPower(shooterD_power);
-            elevatorOff();
-        }
+//        if (!openShooting && !isAuto) {
+//            isLastShoot = false;
+//            shooterU.setPower(0);
+//            shooterD.setPower(0);
+//            elevatorOff();
+//        } else if (!openShooting && isAuto) {
+//            shooterU.setPower(shooterU_power);
+//            shooterD.setPower(shooterD_power);
+//            elevatorOff();
+//        } else if (openShooting && (isAuto || isLastShoot)) {
+//            shooterU.setPower(shooterU_power);
+//            shooterD.setPower(shooterD_power);
+//            elevatorUp();
+//        } else if (openShooting && !isAuto && Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1) {
+//            isLastShoot = true;
+//            shooterU.setPower(shooterU_power);
+//            shooterD.setPower(shooterD_power);
+//            elevatorUp();
+//        } else {
+//            shooterU.setPower(shooterU_power);
+//            shooterD.setPower(shooterD_power);
+//            elevatorOff();
+//        }
 
+        shooterU.setPower(shooterU_power);
+        shooterD.setPower(shooterD_power);
     }
 
     public int tagNumber() {

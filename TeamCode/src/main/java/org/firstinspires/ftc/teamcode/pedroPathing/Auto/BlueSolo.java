@@ -88,8 +88,8 @@ public class BlueSolo extends RobotBase {
                 setPathState(13);
             }
         } else if (pathState == 13) {
-            follower.setTeleOpDrive(0.35, 0, 0, true);
-            if (pathTimer.getElapsedTimeSeconds() > 1.2) {
+            follower.setTeleOpDrive(0.2, 0, 0, true);
+            if (pathTimer.getElapsedTimeSeconds() > 1.5) {
                 follower.breakFollowing();
                 setPathState(14);
             }
@@ -255,6 +255,7 @@ public class BlueSolo extends RobotBase {
     @Override
     public void robotStart() {
         isAuto = true;
+        foot.robotDown();
         opmodeTimer.resetTimer();
         setPathState(0);
     }
