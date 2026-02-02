@@ -215,6 +215,7 @@ public class BlueSolo extends RobotBase {
         telemetry.addData("1", colorSpinner.place1);
         telemetry.addData("2", colorSpinner.place2);
         telemetry.addData("3", colorSpinner.place3);
+        telemetry.addData("now yaw degree", shooter.getDegree());
         telemetry.addData("getTx", shooter.limelight.getLatestResult().getTx());
         telemetry.addData("detect color", spinDETECT);
         // Feedback to Driver Hub
@@ -253,6 +254,7 @@ public class BlueSolo extends RobotBase {
      **/
     @Override
     public void robotStart() {
+        isAuto = true;
         opmodeTimer.resetTimer();
         setPathState(0);
     }

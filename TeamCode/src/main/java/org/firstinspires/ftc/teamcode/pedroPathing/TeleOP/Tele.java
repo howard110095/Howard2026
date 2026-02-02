@@ -88,7 +88,6 @@ public abstract class Tele extends RobotBase {
             shooter.shootingPRO(targetAprilTag(), setVelocity, setYawDegree, setPitchDegree, setShooting);
         }
 
-
         if (!last1RB && gamepad1.right_bumper) NormalMode = !NormalMode;
         last1RB = gamepad1.right_bumper;
 
@@ -118,10 +117,11 @@ public abstract class Tele extends RobotBase {
 //            follower.setTeleOpDrive(axial, lateral, yaw * 0.8, false);
 //        }
 
-        telemetry.addData("velocity", v);
-        telemetry.addData("angle", angle);
-        telemetry.addData("distance", shooter.distance(targetAprilTag()));
+
+        telemetry.addData("now yaw degree", shooter.getDegree());
+        telemetry.addData("distance", shooter.targetDistance);
         telemetry.addData("tx", shooter.limelight.getLatestResult().getTx());
+        telemetry.addData("target velocity", toVelocity);
         telemetry.addData("shooter Up velocity", shooter.shooterU.getVelocity() / 28.0 * 60.0);
         telemetry.addData("shooter Down velocity", shooter.shooterD.getVelocity() / 28.0 * 60.0);
         telemetry.addData("X", follower.getPose().getX());

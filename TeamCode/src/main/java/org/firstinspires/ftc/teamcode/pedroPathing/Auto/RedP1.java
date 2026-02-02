@@ -220,6 +220,7 @@ public class RedP1 extends RobotBase {
 
     @Override
     public void robotStart() {
+        isAuto = true;
         opmodeTimer.resetTimer();
         setPathState(0);
     }
