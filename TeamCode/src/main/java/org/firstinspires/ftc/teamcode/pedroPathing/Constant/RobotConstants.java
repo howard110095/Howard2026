@@ -6,7 +6,7 @@ import com.pedropathing.geometry.Pose;
 @Configurable
 public class RobotConstants {
     //mode
-    public static boolean isAuto = true;
+    public static boolean isAuto = true, FieldReverse = false;
 
     // shooting pro constant
     public static int setAprilTagMode = 0;
@@ -38,9 +38,9 @@ public class RobotConstants {
     public static Pose B_P1_seeAprilTag = new Pose(-12, 12, Math.toRadians(180));
     public static Pose B_P1_shoot = new Pose(-20, 12, Math.toRadians(180));
     public static Pose B_P1_start = new Pose(-50.85, 51.33, Math.toRadians(140));
-    public static Pose B_P1_R1_end = new Pose(-52, 12, Math.toRadians(180));
+    public static Pose B_P1_R1_end = new Pose(-50, 12, Math.toRadians(180));
     public static Pose B_P1_Open1_control = new Pose(-48, 9, Math.toRadians(180));
-    public static Pose B_P1_Open1_end = new Pose(-53, 6, Math.toRadians(180));
+    public static Pose B_P1_Open1_end = new Pose(-50, 6, Math.toRadians(180));
     public static Pose B_P1_R2_control = new Pose(-18, -12, Math.toRadians(180));
     public static Pose B_P1_R2_end = new Pose(-55, -12, Math.toRadians(180));
     public static Pose B_P1_R3_control = new Pose(-12, -36, Math.toRadians(180));
@@ -65,9 +65,9 @@ public class RobotConstants {
     public static Pose R_P1_seeAprilTag = new Pose(12, 12, Math.toRadians(0));
     public static Pose R_P1_shoot = new Pose(20, 12, Math.toRadians(0));
     public static Pose R_P1_start = new Pose(50.85, 51.33, Math.toRadians(40));
-    public static Pose R_P1_R1_end = new Pose(52, 12, Math.toRadians(0));
+    public static Pose R_P1_R1_end = new Pose(50, 12, Math.toRadians(0));
     public static Pose R_P1_Open1_control = new Pose(48, 9, Math.toRadians(0));
-    public static Pose R_P1_Open1_end = new Pose(53, 6, Math.toRadians(0));
+    public static Pose R_P1_Open1_end = new Pose(50, 6, Math.toRadians(0));
     public static Pose R_P1_R2_control = new Pose(18, -12, Math.toRadians(0));
     public static Pose R_P1_R2_end = new Pose(55, -12, Math.toRadians(0));
     public static Pose R_P1_R3_control = new Pose(12, -36, Math.toRadians(0));

@@ -4,7 +4,10 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.*;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.util.Timer;
+import com.pedropathing.paths.PathChain;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 
@@ -14,13 +17,21 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 public abstract class Tele extends RobotBase {
     protected abstract int targetAprilTag();
 
-    public boolean driveMode = false, lastDriveMode = true;
+    public static double v = 3500, angle = 48;
+    boolean teleopStarted = false;
+    private Pose parkingB1 = new Pose(30, 18, Math.toRadians(270));
+    private Pose parkingB2 = new Pose(36, 36, Math.toRadians(90));
+    private Pose parkingR1 = new Pose(36, -12, Math.toRadians(90));
+    private Pose parkingR2 = new Pose(36, -36, Math.toRadians(270));
+    private PathChain tracking;
+    private Timer TeleTimer;
     public double hangYawDegree = 0, hangPitch = 45;
-    int EndGameMode = 0, isChangeDriveMode = 1;
+    int EndGameMode = 0;
     boolean last1RB = false, NormalMode = true;
 
     @Override
     public void robotInit() {
+        TeleTimer = new Timer();
         yawDegreeOffset = 0;
         isAuto = false;
         if (savedPose != null) startingPose = savedPose;
@@ -33,15 +44,19 @@ public abstract class Tele extends RobotBase {
 
     @Override
     public void robotStart() {
+        TeleTimer.resetTimer();
         follower.startTeleopDrive();
+        if (targetAprilTag() == 2 && !FieldReverse) {
+            follower.setX(-follower.getPose().getX());
+            follower.setY(-follower.getPose().getY());
+            follower.setHeading(Math.toRadians(Math.toDegrees(follower.getPose().getHeading()) + 180.0));
+            FieldReverse = true;
+        }
     }
 
     @Override
     public void robotLoop() {
         InitPose();
-        if (gamepad1.dpad_up) follower.setPose(InitCenter);
-        if (gamepad1.dpad_left) follower.setPose(InitBlueCorner);
-        if (gamepad1.dpad_right) follower.setPose(InitRedCorner);
 
         if (gamepad1.y) EndGameMode = 3;
         if (gamepad1.b) EndGameMode = 2;
@@ -60,16 +75,17 @@ public abstract class Tele extends RobotBase {
             colorSpinner.spin.setPower(0);
             intake.off();
         } else {
-            foot.robotDown();
+            if (gamepad1.right_trigger > 0.3) foot.robotDefend();
+            else foot.robotDown();
+
             yawDegreeOffset += gamepad2.right_stick_x;
 
             ShooterIntakeControl();
-
             if (NormalMode) AutoTrackingMode();
             else HandMode(); // vision, pinpoint are not work (fool mode)
 
             //set shooting constant
-            shooter.shootingPRO(targetAprilTag() * isChangeDriveMode, setVelocity, setYawDegree, setPitchDegree, setShooting);
+            shooter.shootingPRO(targetAprilTag(), setVelocity, setYawDegree, setPitchDegree, setShooting);
         }
 
 
@@ -82,24 +98,29 @@ public abstract class Tele extends RobotBase {
         double yaw = -gamepad1.right_stick_x;
 
         follower.update();
-        if (gamepad1.left_stick_button) driveMode = true;
-        if (gamepad1.right_stick_button) driveMode = false;
+        follower.setTeleOpDrive(axial, lateral, yaw * 0.8, false);
 
-        if (lastDriveMode && !driveMode && targetAprilTag() == 2) {
-            isChangeDriveMode = -1;
-            follower.setX(-follower.getPose().getX());
-            follower.setY(-follower.getPose().getY());
-            follower.setHeading(Math.toRadians(Math.toDegrees(follower.getPose().getHeading()) + 180.0));
-        } else if (!lastDriveMode && driveMode && targetAprilTag() == 2) {
-            isChangeDriveMode = 1;
-            follower.setX(-follower.getPose().getX());
-            follower.setY(-follower.getPose().getY());
-            follower.setHeading(Math.toRadians(Math.toDegrees(follower.getPose().getHeading()) + 180.0));
-        }
+//        if (gamepad1.left_trigger > 0.3) {
+//            teleopStarted = false;
+//            tracking = follower.pathBuilder()
+//                    .addPath(new BezierLine(follower.getPose(), parkingB1))
+//                    .setLinearHeadingInterpolation(follower.getPose().getHeading(), parkingB1.getHeading())
+//                    .build();
+//            follower.followPath(tracking, true);
+//            follower.update();
+//        } else {
+//            if (!teleopStarted) {
+//                follower.breakFollowing();
+//                follower.startTeleopDrive();
+//                teleopStarted = true;
+//            }
+//            follower.update();
+//            follower.setTeleOpDrive(axial, lateral, yaw * 0.8, false);
+//        }
 
-        lastDriveMode = driveMode;
-        follower.setTeleOpDrive(axial, lateral, yaw * 0.8, driveMode);
-
+        telemetry.addData("velocity", v);
+        telemetry.addData("angle", angle);
+        telemetry.addData("distance", shooter.distance(targetAprilTag()));
         telemetry.addData("tx", shooter.limelight.getLatestResult().getTx());
         telemetry.addData("shooter Up velocity", shooter.shooterU.getVelocity() / 28.0 * 60.0);
         telemetry.addData("shooter Down velocity", shooter.shooterD.getVelocity() / 28.0 * 60.0);
@@ -113,7 +134,16 @@ public abstract class Tele extends RobotBase {
     }
 
     public void InitPose() {
-        if (targetAprilTag() == 2 && !driveMode) { //no head
+        if (gamepad1.dpad_up)
+            follower.setHeading(Math.toRadians(0)); //front
+        if (gamepad1.dpad_right)
+            follower.setHeading(Math.toRadians(270)); //right
+        if (gamepad1.dpad_left)
+            follower.setHeading(Math.toRadians(90)); //left
+        if (gamepad1.dpad_down)
+            follower.setHeading(Math.toRadians(180)); //back
+
+        if (targetAprilTag() == 2) { //blue
             if (gamepad2.dpad_up)
                 follower.setPose(new Pose(InitUpX, -InitUpY, Math.toRadians(270))); //blue area
             if (gamepad2.dpad_right)
@@ -122,15 +152,6 @@ public abstract class Tele extends RobotBase {
                 follower.setPose(new Pose(InitCornerX, InitCornerY, Math.toRadians(0))); //red human
             if (gamepad2.dpad_down)
                 follower.setPose(new Pose(-InitCornerX, InitCornerY, Math.toRadians(180))); //blue human
-        } else if (targetAprilTag() == 2 && driveMode) { //have head
-            if (gamepad2.dpad_up)
-                follower.setPose(new Pose(-InitUpX, InitUpY, Math.toRadians(90))); //blue area
-            if (gamepad2.dpad_right)
-                follower.setPose(new Pose(InitUpX, InitUpY, Math.toRadians(90))); //red area
-            if (gamepad2.dpad_left)
-                follower.setPose(new Pose(-InitCornerX, -InitCornerY, Math.toRadians(180))); //red human
-            if (gamepad2.dpad_down)
-                follower.setPose(new Pose(InitCornerX, -InitCornerY, Math.toRadians(0))); //blue human
         } else {
             if (gamepad2.dpad_up)
                 follower.setPose(new Pose(InitUpX, InitUpY, Math.toRadians(90))); //red area
@@ -152,10 +173,6 @@ public abstract class Tele extends RobotBase {
             setShooting = false;
             colorSpinner.out();
             intake.out();
-        } else if (gamepad1.left_trigger > 0.3) { //intake ball
-            setShooting = false;
-            colorSpinner.slowMode();
-            intake.on();
         } else {
             setShooting = false;
             colorSpinner.slowMode();

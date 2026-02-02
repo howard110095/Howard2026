@@ -21,7 +21,7 @@ import java.util.List;
 @Configurable
 public class Shooter {
     public boolean isLastShoot = false;
-    public static double poseTarget = 0.5, poseDelta = 0;
+    public static double poseTarget = 0.5, poseDelta = 0, targetDistance = 0;
     public DcMotorEx shooterU, shooterD, elevator;
     public Servo arm, turretPitchL, turretPitchR, shooterSpinner1, shooterSpinner2, led;
     public AnalogInput aimAnalogInput;
@@ -68,8 +68,7 @@ public class Shooter {
             else x = AutoBlueX;
         } else {
             if (pipe == 0) x = TeleRedX;
-            else if (pipe == 2) x = TeleBlueX;
-            else x = -TeleBlueX;
+            else x = -TeleBlueX; // no head
         }
         return x - follower.getPose().getX();
     }
@@ -82,7 +81,6 @@ public class Shooter {
             else y = AutoBlueY;
         } else {
             if (pipe == 0) y = TeleRedY;
-            else if (pipe == 2) y = TeleBlueY;
             else y = -TeleBlueY;
         }
         return y - follower.getPose().getY();
@@ -100,13 +98,14 @@ public class Shooter {
         // shooting Velocity
         toVelocity = targetVelocity;
         if (targetVelocity == 0) {  //tracking
-            if (result != null && result.isValid()) { //have apriltag, velocity
-                d = 20.0 + ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + limelight.getLatestResult().getTy())));
-                toVelocity = 11.144 * d + 2476.3; //2376.3
-            } else
-                toVelocity = 11.144 * distance(pipeline) + 2476.3; // no apriltag, velocity formula
-            //2376.3
-//            if (toVelocity > 3550) toVelocity += 80.0;
+            if (result != null && result.isValid())  //have apriltag, velocity
+                targetDistance = 20.0 + ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + limelight.getLatestResult().getTy())));
+            else
+                targetDistance = distance(pipeline);
+
+            if (targetDistance > 115) toVelocity = 24.306 * targetDistance + 880.22;
+            else toVelocity = 11.144 * targetDistance + 2376.3;
+
         }
         double velocity1 = toVelocity / 4600;
         double velocity2 = toVelocity / 4300;
@@ -125,9 +124,6 @@ public class Shooter {
         toYawDegree = turretTargetYaw;
         if (turretTargetYaw == -500) {  //tracking
             double targetDegree;
-//            if (dy(pipeline) < 0)
-//                targetDegree = (dx(pipeline) >= 0) ? 0 : 180;   // right → 0, left → 180
-//            else
             targetDegree = Math.toDegrees(Math.atan2(dy(pipeline), dx(pipeline)));
             double heading = Math.toDegrees(follower.getPose().getHeading());
             toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
@@ -143,17 +139,21 @@ public class Shooter {
         // turret target pitch degree
         toPitchDegree = turretTargetPitch;
         if (turretTargetPitch == 0) {
-            if (result != null && result.isValid()) toPitchDegree = 0.3472 * d + 12.679;
-            else toPitchDegree = 0.3472 * distance(pipeline) + 12.679;
+            if (targetDistance > 100) toPitchDegree = 48;
+            else toPitchDegree = 0.3472 * targetDistance + 12.679;
         }
         pitchDegree(toPitchDegree);
 
         // shooting or not
-        boolean speedReady = Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1;
+//        boolean speedReady = Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1;
         if (!openShooting && !isAuto) {
             isLastShoot = false;
             shooterU.setPower(0);
             shooterD.setPower(0);
+            elevatorOff();
+        } else if (!openShooting && isAuto) {
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
             elevatorOff();
         } else if (openShooting && (isAuto || isLastShoot)) {
             shooterU.setPower(shooterU_power);

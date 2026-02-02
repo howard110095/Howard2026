@@ -32,12 +32,11 @@ public class BlueSolo extends RobotBase {
                 .setLinearHeadingInterpolation(B_P1_seeAprilTag.getHeading(), B_P1_R1_end.getHeading())
                 .addPath(new BezierLine(B_P1_R1_end, B_P1_Open1_end))
                 .setLinearHeadingInterpolation(B_P1_R1_end.getHeading(), B_P1_Open1_end.getHeading())
-                .setBrakingStrength(0.5)
                 .build();
 
         path1_back = follower.pathBuilder()
-                .addPath(new BezierLine(B_P1_R1_end, B_P1_shoot))
-                .setLinearHeadingInterpolation(B_P1_R1_end.getHeading(), B_P1_shoot.getHeading())
+                .addPath(new BezierLine(follower.getPose(), B_P1_shoot))
+                .setLinearHeadingInterpolation(follower.getPose().getHeading(), B_P1_shoot.getHeading())
                 .build();
 
         path2 = follower.pathBuilder()
@@ -73,11 +72,10 @@ public class BlueSolo extends RobotBase {
             if (pathTimer.getElapsedTimeSeconds() >= shootingTime) setPathState(10);
         }
         //to 1 roll
-        else if (pathState == 10) {
+        else if (pathState == 10) { // see tag
             if (pathTimer.getElapsedTimeSeconds() > 0.3) setPathState(11);
         } else if (pathState == 11) {
             if (!follower.isBusy()) {
-//                intake.on();
                 setShooting = false;
                 colorSpinner.slowMode();
                 follower.followPath(path1_go, true);
@@ -85,24 +83,30 @@ public class BlueSolo extends RobotBase {
                 setPathState(12);
             }
         } else if (pathState == 12) {
-            if (!follower.isBusy()) setPathState(13);
+            if (!follower.isBusy()) {
+                follower.startTeleopDrive();
+                setPathState(13);
+            }
         } else if (pathState == 13) {
-            if (pathTimer.getElapsedTimeSeconds() > 1.2) setPathState(14);
+            follower.setTeleOpDrive(0.35, 0, 0, true);
+            if (pathTimer.getElapsedTimeSeconds() > 1.2) {
+                follower.breakFollowing();
+                setPathState(14);
+            }
         } else if (pathState == 14) {
-            spinDETECT = true;
             if (!(21 <= AprilTagNumber && AprilTagNumber <= 23)) AprilTagNumber = 21;
-//            intake.on();
             follower.followPath(path1_back, true);
             setPathState(15);
         } else if (pathState == 15) {
-            if (!follower.isBusy()) {
-//                intake.off();
-                setPathState(17);
+            if (follower.getPose().getX() > -35) {
+                spinDETECT = true;
+                setPathState(16);
             }
+        } else if (pathState == 16) {
+            if (!follower.isBusy()) setPathState(17);
         } else if (pathState == 17) {
             if (pathTimer.getElapsedTimeSeconds() >= waitingTime) setPathState(18);
         } else if (pathState == 18) {
-//            intake.off();
             spinDETECT = false;
             colorSpinner.logic(AprilTagNumber);
             if (pathTimer.getElapsedTimeSeconds() >= toReadyShootingTime) setPathState(19);
@@ -163,7 +167,7 @@ public class BlueSolo extends RobotBase {
                 setPathState(34);
             }
         } else if (pathState == 34) {
-            if (!follower.isBusy())  setPathState(36);
+            if (!follower.isBusy()) setPathState(36);
         } else if (pathState == 36) {
             if (pathTimer.getElapsedTimeSeconds() >= waitingTime) setPathState(37);
         } else if (pathState == 37) {

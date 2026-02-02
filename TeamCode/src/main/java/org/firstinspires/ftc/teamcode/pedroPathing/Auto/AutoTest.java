@@ -39,19 +39,21 @@ public class AutoTest extends RobotBase {
             follower.followPath(front, true);
             setPathState(1);
         } else if (pathState == 1) {
-            if (!follower.isBusy()) setPathState(2);
+            if (!follower.isBusy()) {
+                follower.startTeleopDrive();     // ← 進推牆模式：manualDrive=true
+                pathTimer.resetTimer();          // ← 開始計時推牆
+                setPathState(2);
+            }
         } else if (pathState == 2) {
-            if (pathTimer.getElapsedTimeSeconds() > 0.5) setPathState(3);
-        } else if (pathState == 3) {
+            follower.setTeleOpDrive(0.35, 0, 0, true);
+            if (pathTimer.getElapsedTimeSeconds() > 2.0) {  // ← 你要推幾秒就填幾秒
+                follower.breakFollowing();                  // 停止推牆
+                setPathState(3);
+            }
+        }else if (pathState == 3) {
             follower.followPath(back, true);
             setPathState(4);
-        }else if (pathState == 4) {
-            if (!follower.isBusy()) setPathState(5);
-        } else if (pathState == 5) {
-            if (pathTimer.getElapsedTimeSeconds() > 0.5) setPathState(0);
         }
-
-
     }
 
     public void setPathState(int pState) {
@@ -77,7 +79,7 @@ public class AutoTest extends RobotBase {
         telemetryM.debug("total heading:" + follower.getTotalHeading());
         telemetryM.update(telemetry);
 
-        draw();
+//        draw();
     }
 
     /**

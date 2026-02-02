@@ -31,7 +31,6 @@ public abstract class RobotBase extends OpMode {
     public static Pose savedPose = null;
     private Supplier<PathChain> pathChain;
     public TelemetryManager telemetryM;
-
     protected ColorSpinner colorSpinner;
     protected Shooter shooter;
     protected Intake intake;
