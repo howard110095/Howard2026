@@ -15,8 +15,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 @Configurable
 @TeleOp(name = "TeleTest", group = "Linear OpMode")
 public class TeleTest extends RobotBase {
-    public static double target = 3300, uP = 0, uI = 0, uD = 0, dP = 0, dI = 0, dD = 0;
-
+    public static double target = 3300, angle = 40;
 
     @Override
     public void robotInit() {
@@ -42,7 +41,7 @@ public class TeleTest extends RobotBase {
 //        shooter.shooterU.setPower(1);
 //        shooter.shooterD.setPower(1);
 
-        shooter.shootingPRO(2, target, setYawDegree, setPitchDegree, true);
+        shooter.shootingPRO(0, target, setYawDegree, angle, true);
 
         // drive
         double axial = -gamepad1.left_stick_y;

@@ -118,7 +118,8 @@ public class Shooter {
             else
                 targetDistance = distance(pipeline);
 
-            if (targetDistance > 115) toVelocity = 24.306 * targetDistance + 880.22;
+            if (targetDistance > 120)
+                toVelocity = 0.4228 * targetDistance * targetDistance - 102.92 * targetDistance + 10300;
             else toVelocity = 11.144 * targetDistance + 2376.3;
 
         }
@@ -154,36 +155,38 @@ public class Shooter {
         // turret target pitch degree
         toPitchDegree = turretTargetPitch;
         if (turretTargetPitch == 0) {
-            toPitchDegree = 0.1602 * targetDistance + 20.7;
+            if (targetDistance < 100) toPitchDegree = 0.3472 * targetDistance + 12.679;
+            else if (targetDistance < 130) toPitchDegree = 45;
+            else if (targetDistance >= 130) toPitchDegree = 47;
+//            toPitchDegree = 0.1602 * targetDistance + 20.7;
         }
         pitchDegree(toPitchDegree);
 
-
         // shooting or not
-//        boolean speedReady = Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1;
-//        if (!openShooting && !isAuto) {
-//            isLastShoot = false;
-//            shooterU.setPower(0);
-//            shooterD.setPower(0);
-//            elevatorOff();
-//        } else if (!openShooting && isAuto) {
-//            shooterU.setPower(shooterU_power);
-//            shooterD.setPower(shooterD_power);
-//            elevatorOff();
-//        } else if (openShooting && (isAuto || isLastShoot)) {
-//            shooterU.setPower(shooterU_power);
-//            shooterD.setPower(shooterD_power);
-//            elevatorUp();
-//        } else if (openShooting && !isAuto && Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1) {
-//            isLastShoot = true;
-//            shooterU.setPower(shooterU_power);
-//            shooterD.setPower(shooterD_power);
-//            elevatorUp();
-//        } else {
-//            shooterU.setPower(shooterU_power);
-//            shooterD.setPower(shooterD_power);
-//            elevatorOff();
-//        }
+        boolean speedReady = Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1;
+        if (!openShooting && !isAuto) {
+            isLastShoot = false;
+            shooterU.setPower(0);
+            shooterD.setPower(0);
+            elevatorOff();
+        } else if (!openShooting && isAuto) {
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
+            elevatorOff();
+        } else if (openShooting && (isAuto || isLastShoot)) {
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
+            elevatorUp();
+        } else if (openShooting && !isAuto && Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1) {
+            isLastShoot = true;
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
+            elevatorUp();
+        } else {
+            shooterU.setPower(shooterU_power);
+            shooterD.setPower(shooterD_power);
+            elevatorOff();
+        }
 
         shooterU.setPower(shooterU_power);
         shooterD.setPower(shooterD_power);
@@ -258,7 +261,7 @@ public class Shooter {
     }
 
     public void pitchDegree(double degree) {
-        degree = clamp(degree, 24, 49);
+        degree = clamp(degree, 24, 48);
         turretPitchR.setPosition(0.03 * (degree) - 0.71);
     }
 
