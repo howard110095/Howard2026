@@ -75,7 +75,6 @@ public class RedP1 extends RobotBase {
 
     public void autonomousPathUpdate() {
         if (pathState == 0) {
-            colorSpinner.slowMode();
             setShooting = false;
             follower.followPath(path0, true);
             setPathState(1);

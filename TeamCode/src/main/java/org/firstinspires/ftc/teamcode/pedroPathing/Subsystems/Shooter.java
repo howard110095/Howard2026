@@ -23,7 +23,7 @@ public class Shooter {
     public boolean isLastShoot = false;
     public static double poseTarget = 0.5, poseDelta = 0, targetDistance = 0;
     public DcMotorEx shooterU, shooterD, elevator;
-    public Servo arm, turretPitchL, turretPitchR, shooterSpinner1, shooterSpinner2, led;
+    public Servo arm, turretPitchL, turretPitchR, shooterSpinner1, shooterSpinner2, led, led1, led2;
     public AnalogInput aimAnalogInput;
     public Limelight3A limelight;
     public PIDController SpinnerPID = new PIDController(0.02, 0, 0.02);
@@ -48,6 +48,10 @@ public class Shooter {
         elevator = hardwareMap.get(DcMotorEx.class, "feed");
         led = hardwareMap.get(Servo.class, "LED");
         led.setPosition(1);
+        led1 = hardwareMap.get(Servo.class, "LED1");
+        led1.setPosition(1);
+        led2 = hardwareMap.get(Servo.class, "LED2");
+        led2.setPosition(1);
 
         shooterU.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterU.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
@@ -143,11 +147,12 @@ public class Shooter {
             targetDegree = Math.toDegrees(Math.atan2(dy(pipeline), dx(pipeline)));
             double heading = Math.toDegrees(follower.getPose().getHeading());
             toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
+            toYawDegree += autoYawOffset;
             if (result != null && result.isValid()) {
-                double deltaDegree = 0;
+//                double deltaDegree = 10;
 //                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = 0; //-3
 //                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 0; //3
-                toYawDegree -= (result.getTx() - deltaDegree) * 0.5;
+                toYawDegree -= (result.getTx()) * 0.5;
             }
         }
         toDegree(toYawDegree);
@@ -162,8 +167,6 @@ public class Shooter {
         }
         pitchDegree(toPitchDegree);
 
-        // shooting or not
-        boolean speedReady = Math.abs(uVelocity - velocity1) < 0.1 && Math.abs(dVelocity - velocity1) < 0.1;
         if (!openShooting && !isAuto) {
             isLastShoot = false;
             shooterU.setPower(0);
@@ -240,14 +243,12 @@ public class Shooter {
     //elevator
     public void elevatorUp() {
         elevator.setPower(1);
-        arm.setPosition(0.39);//white
-//        arm.setPosition(0.5);//black
+        arm.setPosition(0.37);//white
     }
 
     public void elevatorOff() {
         elevator.setPower(0);
         arm.setPosition(0.7); //white
-//        arm.setPosition(0.7); //black
     }
 
     public void cleaning() {

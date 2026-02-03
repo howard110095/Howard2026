@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 @Configurable
 @TeleOp(name = "TeleTest", group = "Linear OpMode")
 public class TeleTest extends RobotBase {
-    public static double target = 3300, angle = 40;
+    public static double target = 120, angle = 40;
 
     @Override
     public void robotInit() {
@@ -34,15 +34,6 @@ public class TeleTest extends RobotBase {
 
     @Override
     public void robotLoop() {
-        intake.on();
-        colorSpinner.slowMode();
-        shooter.elevatorUp();
-
-//        shooter.shooterU.setPower(1);
-//        shooter.shooterD.setPower(1);
-
-//        shooter.shootingPRO(0, target, setYawDegree, angle, true);
-
         // drive
         double axial = -gamepad1.left_stick_y;
         double lateral = -gamepad1.left_stick_x;
@@ -65,21 +56,14 @@ public class TeleTest extends RobotBase {
 
 //        telemetryM.addData("setColor", setColor);
 //        telemetryM.addData("get now", shooter.getDegree());
-        telemetryM.addData("distance", shooter.distance(0));
-        telemetryM.addData("Up Power", shooter.shooterU.getPower());
-        telemetryM.addData("Down Power", shooter.shooterD.getPower());
+//        telemetryM.addData("distance", shooter.distance(0));
+//        telemetryM.addData("Up Power", shooter.shooterU.getPower());
+//        telemetryM.addData("Down Power", shooter.shooterD.getPower());
         telemetryM.addData("target", target);
         telemetryM.addData("up velocity rpm", shooter.shooterU.getVelocity() / 28.0 * 60.0);
         telemetryM.addData("down velocity rpm", shooter.shooterD.getVelocity() / 28.0 * 60.0);
-        telemetryM.addData("p", shooter.ShooterUPID.getP());
-        telemetryM.addData("i", shooter.ShooterUPID.getI());
-        telemetryM.addData("d", shooter.ShooterUPID.getD());
-        telemetryM.addData(" p", shooter.ShooterDPID.getP());
-        telemetryM.addData(" i", shooter.ShooterDPID.getI());
-        telemetryM.addData(" d", shooter.ShooterDPID.getD());
-//        telemetryM.addData("target", t);
-//        telemetryM.addData("get degree", shooter.getDegree());
-//        telemetryM.addData("getLatestResult", shooter.limelight.getLatestResult().getTx());
+        telemetryM.addData("target",target);
+        telemetryM.addData("now degree",colorSpinner.getDegree());
         telemetryM.addData("X", follower.getPose().getX());
         telemetryM.addData("Y", follower.getPose().getY());
         telemetryM.addData("Heading", Math.toDegrees(follower.getHeading()));

@@ -32,6 +32,7 @@ public abstract class Tele extends RobotBase {
     @Override
     public void robotInit() {
         TeleTimer = new Timer();
+        autoYawOffset = 0;
         yawDegreeOffset = 0;
         isAuto = false;
         if (savedPose != null) startingPose = savedPose;
