@@ -26,6 +26,7 @@ public class DistanceTest extends RobotBase {
 
     @Override
     public void robotLoop() {
+        shooter.shootingPRO(0, 300, -500, 0, false);
 
         // drive
         double axial = -gamepad1.left_stick_y;
@@ -35,10 +36,10 @@ public class DistanceTest extends RobotBase {
         follower.setTeleOpDrive(axial, lateral, -yaw * 0.8, true);
 
 
-
         telemetry.addData("pinpoint distance", shooter.distance(0));
         telemetry.addData("limelight distance", 20.0 + ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + shooter.limelight.getLatestResult().getTy()))));
-        telemetry.addData("limelight ty",shooter.limelight.getLatestResult().getTy());
+        telemetry.addData("Error distance", shooter.distance(0) - 20.0 - ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + shooter.limelight.getLatestResult().getTy()))));
+        telemetry.addData("limelight ty", shooter.limelight.getLatestResult().getTy());
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", Math.toDegrees(follower.getHeading()));

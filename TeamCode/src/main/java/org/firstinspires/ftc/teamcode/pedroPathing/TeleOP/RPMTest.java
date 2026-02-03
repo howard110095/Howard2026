@@ -4,6 +4,8 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.isAuto;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.setPitchDegree;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotConstants.setYawDegree;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -34,7 +36,7 @@ public class RPMTest extends RobotBase {
     public void robotLoop() {
         intake.on();
         colorSpinner.on();
-        shooter.shootingPRO(0, targetVelocity, -500, 0, true);
+        shooter.shootingPRO(0, targetVelocity, setYawDegree, setPitchDegree, true);
 
         // drive
         double axial = -gamepad1.left_stick_y;
@@ -43,6 +45,7 @@ public class RPMTest extends RobotBase {
         follower.update();
         follower.setTeleOpDrive(axial, lateral, -yaw * 0.8, true);
 
+        telemetry.addData("distance", shooter.distance(0));
         telemetry.addData("Target velocity rpm", targetVelocity);
         telemetry.addData("up velocity rpm", shooter.shooterU.getVelocity() / 28 * 60);
         telemetry.addData("down velocity rpm", shooter.shooterD.getVelocity() / 28 * 60);

@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.List;
 
-@Configurable
+//@Configurable
 public class Shooter {
     public boolean isLastShoot = false;
     public static double poseTarget = 0.5, poseDelta = 0, targetDistance = 0;
@@ -149,9 +149,6 @@ public class Shooter {
             toYawDegree = ((targetDegree - heading + 540) % 360) - 180;
             toYawDegree += autoYawOffset;
             if (result != null && result.isValid()) {
-//                double deltaDegree = 10;
-//                if (follower.getPose().getY() < -12 && pipeline == 0) deltaDegree = 0; //-3
-//                else if (follower.getPose().getY() < -12 && pipeline == 2) deltaDegree = 0; //3
                 toYawDegree -= (result.getTx()) * 0.5;
             }
         }
