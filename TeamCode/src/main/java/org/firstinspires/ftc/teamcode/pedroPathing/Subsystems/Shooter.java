@@ -119,7 +119,7 @@ public class Shooter {
                 targetDistance = distance(pipeline);
 
             if (targetDistance > 120)
-                toVelocity = 0.4228 * targetDistance * targetDistance - 102.92 * targetDistance + 10300;
+                toVelocity = 0.4228 * targetDistance * targetDistance - 102.92 * targetDistance + 10200;
             else toVelocity = 11.144 * targetDistance + 2376.3;
 
         }

@@ -41,7 +41,7 @@ public class TeleTest extends RobotBase {
 //        shooter.shooterU.setPower(1);
 //        shooter.shooterD.setPower(1);
 
-        shooter.shootingPRO(0, target, setYawDegree, angle, true);
+//        shooter.shootingPRO(0, target, setYawDegree, angle, true);
 
         // drive
         double axial = -gamepad1.left_stick_y;

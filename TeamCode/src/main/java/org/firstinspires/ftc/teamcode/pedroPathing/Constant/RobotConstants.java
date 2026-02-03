@@ -24,7 +24,7 @@ public class RobotConstants {
     //field
     public static double AutoBlueX = -66, AutoBlueY = 66, AutoRedX = 66, AutoRedY = 66, AutoMidX = 0, AutoMidY = 72;
     public static double TeleBlueX = -66, TeleBlueY = 66, TeleRedX = 66, TeleRedY = 66;
-    public static double InitUpX = 34.7, InitUpY = 62.1, InitCornerX = 59.5, InitCornerY = 63;
+    public static double InitUpX = 31.73, InitUpY = 61.47, InitCornerX = 59.5, InitCornerY = 63;
 
     //Auto
     public static double shootingTime = 2.2, waitingTime = 0.2, toReadyShootingTime = 0.5, quickShootTime = 1.2;
@@ -33,7 +33,7 @@ public class RobotConstants {
     //blue pose
     public static Pose B_P1_seeAprilTag = new Pose(-12, 12, Math.toRadians(180));
     public static Pose B_P1_shoot = new Pose(-20, 12, Math.toRadians(180));
-    public static Pose B_P1_start = new Pose(-52.3, 46.5, Math.toRadians(140));
+    public static Pose B_P1_start = new Pose(-52.3, 50.7, Math.toRadians(140));
     public static Pose B_P1_R1_end = new Pose(-50, 12, Math.toRadians(180));
     public static Pose B_P1_Open1_control = new Pose(-48, 9, Math.toRadians(180));
     public static Pose B_P1_Open1_end = new Pose(-50, 6, Math.toRadians(180));
@@ -60,7 +60,7 @@ public class RobotConstants {
     //red pose
     public static Pose R_P1_seeAprilTag = new Pose(12, 12, Math.toRadians(0));
     public static Pose R_P1_shoot = new Pose(20, 12, Math.toRadians(0));
-    public static Pose R_P1_start = new Pose(52.3, 46.5, Math.toRadians(40));
+    public static Pose R_P1_start = new Pose(52.3, 50.7, Math.toRadians(40));
     public static Pose R_P1_R1_end = new Pose(50, 12, Math.toRadians(0));
     public static Pose R_P1_Open1_control = new Pose(48, 9, Math.toRadians(0));
     public static Pose R_P1_Open1_end = new Pose(50, 6, Math.toRadians(0));

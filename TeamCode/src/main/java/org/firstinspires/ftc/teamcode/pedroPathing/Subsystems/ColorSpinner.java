@@ -52,9 +52,6 @@ public class ColorSpinner {
 
     public double getDegree() {
         double pose = (getPose() - 226.5) * 360.0 / 350.4;
-//        = getPose();
-//        pose -= 226.5;
-//        pose *= 360 / 350.4;
         if (pose < 0) pose += 360;
         return pose;
     }
@@ -91,6 +88,19 @@ public class ColorSpinner {
                 if (place1 == 0) place1 = 14 - place2 - place3;
                 else if (place2 == 0) place2 = 14 - place1 - place3;
                 else place3 = 14 - place1 - place2;
+            } else if (place1 == 4 || place2 == 4 || place3 == 4) {
+                place1 = (place1 == 4) ? 4 : 5;
+                place2 = (place2 == 4) ? 4 : 5;
+                place3 = (place3 == 4) ? 4 : 5;
+            } else if (place1 == 5) {
+                place2 = 5;
+                place3 = 4;
+            } else if (place2 == 5) {
+                place3 = 5;
+                place1 = 4;
+            } else if (place3 == 5) {
+                place1 = 5;
+                place2 = 4;
             } else {
                 place1 = 5;
                 place2 = 4;
