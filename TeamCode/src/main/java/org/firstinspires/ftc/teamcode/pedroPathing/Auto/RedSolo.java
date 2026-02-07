@@ -62,6 +62,7 @@ public class RedSolo extends RobotBase {
 
     public void autonomousPathUpdate() {
         if (pathState == 0) {
+            velocityOffset = 150;
             setShooting = false;
             follower.followPath(path0, true);
             setPathState(1);
@@ -74,6 +75,7 @@ public class RedSolo extends RobotBase {
         } else if (pathState == 2) {
             if (!follower.isBusy()) setPathState(3);
         } else if (pathState == 3) {
+            velocityOffset = 0;
             if (pathTimer.getElapsedTimeSeconds() >= 1.5) {
                 setShooting = false;
                 colorSpinner.slowMode();
@@ -130,7 +132,7 @@ public class RedSolo extends RobotBase {
             if (!follower.isBusy()) {
                 setShooting = false;
                 colorSpinner.slowMode();
-                follower.followPath(path2, 0.7, true);
+                follower.followPath(path2, 0.85, true);
                 colorSpinner.colorRenew();
                 setPathState(22);
             }
@@ -160,7 +162,7 @@ public class RedSolo extends RobotBase {
             if (!follower.isBusy()) {
                 setShooting = false;
                 colorSpinner.slowMode();
-                follower.followPath(path3, 0.8, true);
+                follower.followPath(path3, 0.9, true);
                 colorSpinner.colorRenew();
                 setPathState(32);
             }
@@ -241,7 +243,7 @@ public class RedSolo extends RobotBase {
         opmodeTimer.resetTimer();
         follower.setStartingPose(R_P1_start);
         buildPaths();
-        autoYawOffset = 10;
+        autoYawOffset = 5;
         setAprilTagMode = 0;
     }
 

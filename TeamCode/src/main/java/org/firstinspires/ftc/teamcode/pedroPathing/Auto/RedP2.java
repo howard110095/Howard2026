@@ -80,9 +80,7 @@ public class RedP2 extends RobotBase {
                 setPathState(12);
             }
         } else if (pathState == 12) {
-            if (follower.getPose().getX() > 40) setPathState(13);
-        } else if (pathState == 13) {
-            if (follower.getPose().getX() < 20) {
+            if (!follower.isBusy()) {
                 setShooting = true;
                 colorSpinner.on();
                 setPathState(14);
@@ -97,15 +95,13 @@ public class RedP2 extends RobotBase {
             }
         }
         //to corner
-        else if (pathState == 21 && time <= 4) {
+        else if (pathState == 21 && time <= 5) {
             if (!follower.isBusy()) {
                 follower.followPath(pathToTakeBall, true);
                 setPathState(22);
             }
-        } else if (pathState == 22) {
-            if (follower.getPose().getX() > 40) setPathState(23);
-        } else if (pathState == 23) {
-            if (follower.getPose().getX() < 24) {
+        }  else if (pathState == 22) {
+            if (!follower.isBusy()) {
                 setShooting = true;
                 colorSpinner.on();
                 setPathState(24);

@@ -31,6 +31,7 @@ public class AutoTest extends RobotBase {
         back = follower.pathBuilder()
                 .addPath(new BezierLine(end, start))
                 .setLinearHeadingInterpolation(end.getHeading(), start.getHeading())
+                .setNoDeceleration()
                 .build();
     }
 

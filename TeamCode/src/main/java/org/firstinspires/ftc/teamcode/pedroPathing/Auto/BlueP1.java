@@ -38,10 +38,10 @@ public class BlueP1 extends RobotBase {
         pathR2 = follower.pathBuilder()
                 .addPath(new BezierCurve(B_P1_shoot, B_P1_R2_control, B_P1_R2_end))
                 .setLinearHeadingInterpolation(B_P1_shoot.getHeading(), B_P1_R2_end.getHeading())
-                .addPath(new BezierCurve(B_P1_R2_end, B_P1_R1_back_control, B_P1_Open1_end))
-                .setLinearHeadingInterpolation(B_P1_R2_end.getHeading(), B_P1_Open1_end.getHeading())
-                .addPath(new BezierLine(B_P1_Open1_end, B_P1_shoot))
-                .setLinearHeadingInterpolation(B_P1_Open1_end.getHeading(), B_P1_shoot.getHeading())
+                .addPath(new BezierCurve(B_P1_R2_end, B_P1_R1_back_control, B_P1_Open2_back_end))
+                .setLinearHeadingInterpolation(B_P1_R2_end.getHeading(), B_P1_Open2_back_end.getHeading())
+                .addPath(new BezierLine(B_P1_Open2_back_end, B_P1_shoot))
+                .setLinearHeadingInterpolation(B_P1_Open2_back_end.getHeading(), B_P1_shoot.getHeading())
                 .build();
 
         pathToTakeBall = follower.pathBuilder()
@@ -75,6 +75,7 @@ public class BlueP1 extends RobotBase {
 
     public void autonomousPathUpdate() {
         if (pathState == 0) {
+            velocityOffset = 150;
             colorSpinner.slowMode();
             setShooting = false;
             follower.followPath(path0, true);
@@ -88,6 +89,7 @@ public class BlueP1 extends RobotBase {
         } else if (pathState == 2) {
             if (!follower.isBusy()) setPathState(3);
         } else if (pathState == 3) {
+            velocityOffset = 0;
             if (pathTimer.getElapsedTimeSeconds() >= 1.5) {
                 setShooting = false;
                 colorSpinner.slowMode();
@@ -170,6 +172,22 @@ public class BlueP1 extends RobotBase {
                 follower.followPath(pathEnd, true);
                 setPathState(41);
             }
+        }else if (pathState == 41) {
+            if (follower.getPose().getX() < -40) setPathState(42);
+        } else if (pathState == 42) {
+            if (follower.getPose().getX() > -24) {
+                setShooting = true;
+                colorSpinner.on();
+                setPathState(43);
+            }
+        } else if (pathState == 43) {
+            if (!follower.isBusy()) setPathState(44);
+        } else if (pathState == 44) {
+            if (pathTimer.getElapsedTimeSeconds() >= quickShootTime) {
+                setShooting = false;
+                colorSpinner.slowMode();
+                setPathState(45);
+            }
         }
     }
 
@@ -184,7 +202,7 @@ public class BlueP1 extends RobotBase {
         autonomousPathUpdate();
         //vision
         intake.on();
-        shooter.shootingPRO(2, setVelocity, setYawDegree, setPitchDegree, setShooting);
+        shooter.shootingPRO(2, setVelocity, -60, setPitchDegree, setShooting);
         // These loop the movements of the robot
 
         telemetry.addData("uVelocity", shooter.limelight.getLatestResult().getTx());

@@ -37,8 +37,8 @@ public class DistanceTest extends RobotBase {
 
 
         telemetry.addData("pinpoint distance", shooter.distance(0));
-        telemetry.addData("limelight distance", 20.0 + ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + shooter.limelight.getLatestResult().getTy()))));
-        telemetry.addData("Error distance", shooter.distance(0) - 20.0 - ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + shooter.limelight.getLatestResult().getTy()))));
+        telemetry.addData("limelight distance", 20.0 + (0.909894063 * (29.5 - 11.5) / Math.tan(Math.toRadians(0.084413 + 19.41 + shooter.limelight.getLatestResult().getTy()))));
+        telemetry.addData("Error distance", shooter.distance(0) - 20.0 - (0.909894063 * (29.5 - 11.5) / Math.tan(Math.toRadians(0.084413 + 19.41 + shooter.limelight.getLatestResult().getTy()))));
         telemetry.addData("limelight ty", shooter.limelight.getLatestResult().getTy());
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());

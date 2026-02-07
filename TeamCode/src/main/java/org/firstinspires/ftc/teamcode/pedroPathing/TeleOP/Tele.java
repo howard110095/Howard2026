@@ -26,8 +26,8 @@ public abstract class Tele extends RobotBase {
     private PathChain tracking;
     private Timer TeleTimer;
     public double hangYawDegree = 0, hangPitch = 48;
-    int EndGameMode = 0;
-    boolean last2B = false, NormalMode = true;
+    int EndGameMode = 0, right2bumper = 0;
+    boolean last2B = false, NormalMode = true, last2RB = false;
 
     @Override
     public void robotInit() {
@@ -92,13 +92,19 @@ public abstract class Tele extends RobotBase {
         if (!last2B && gamepad2.b) NormalMode = !NormalMode;
         last2B = gamepad2.b;
 
+        if (!last2RB && gamepad2.right_bumper) right2bumper++;
+        last2RB = gamepad2.right_bumper;
+
         // drive
         double axial = -gamepad1.left_stick_y;
         double lateral = -gamepad1.left_stick_x;
         double yaw = -gamepad1.right_stick_x;
 
         follower.update();
-        follower.setTeleOpDrive(axial, lateral, yaw * 0.8, !NormalMode);
+        if (right2bumper % 2 == 0)
+            follower.setTeleOpDrive(axial, lateral, yaw * 0.8, !NormalMode);
+        else
+            follower.setTeleOpDrive(axial * 0.4, lateral * 0.4, yaw * 0.32, !NormalMode);
 
 //        if (gamepad1.left_trigger > 0.3) {
 //            teleopStarted = false;
@@ -168,9 +174,9 @@ public abstract class Tele extends RobotBase {
     public void ShooterIntakeControl() {
         if (gamepad1.right_trigger > 0.3) { //shooting
             setShooting = true;
-            colorSpinner.on();
+            colorSpinner.shooting();
             intake.on();
-        } else if (gamepad1.left_bumper) {  //out ball
+        } else if (gamepad1.left_bumper || gamepad2.left_bumper) {  //out ball
             setShooting = false;
             colorSpinner.out();
             intake.out();
@@ -197,7 +203,8 @@ public abstract class Tele extends RobotBase {
         hangPitch -= gamepad2.left_stick_y * 0.8; // adjust pitch degree
 
         setVelocity = 3200;
-        setYawDegree =  clamp(hangYawDegree, -90.0, 90.0);;
+        setYawDegree = clamp(hangYawDegree, -90.0, 90.0);
+        ;
         setPitchDegree = clamp(hangPitch, 24.0, 49.0);
         telemetry.addData("Mode", "Hand Mode");
     }

@@ -38,10 +38,10 @@ public class RedP1 extends RobotBase {
         pathR2 = follower.pathBuilder()
                 .addPath(new BezierCurve(R_P1_shoot, R_P1_R2_control, R_P1_R2_end))
                 .setLinearHeadingInterpolation(R_P1_shoot.getHeading(), R_P1_R2_end.getHeading())
-                .addPath(new BezierCurve(R_P1_R2_end, R_P1_R1_back_control, R_P1_Open1_end))
-                .setLinearHeadingInterpolation(R_P1_R2_end.getHeading(), R_P1_Open1_end.getHeading())
-                .addPath(new BezierLine(R_P1_Open1_end, R_P1_shoot))
-                .setLinearHeadingInterpolation(R_P1_Open1_end.getHeading(), R_P1_shoot.getHeading())
+                .addPath(new BezierCurve(R_P1_R2_end, R_P1_R1_back_control, R_P1_Open2_back_end))
+                .setLinearHeadingInterpolation(R_P1_R2_end.getHeading(), R_P1_Open2_back_end.getHeading())
+                .addPath(new BezierLine(R_P1_Open2_back_end, R_P1_shoot))
+                .setLinearHeadingInterpolation(R_P1_Open2_back_end.getHeading(), R_P1_shoot.getHeading())
                 .build();
 
         pathToTakeBall = follower.pathBuilder()
@@ -75,6 +75,7 @@ public class RedP1 extends RobotBase {
 
     public void autonomousPathUpdate() {
         if (pathState == 0) {
+            velocityOffset = 150;
             setShooting = false;
             follower.followPath(path0, true);
             setPathState(1);
@@ -87,6 +88,7 @@ public class RedP1 extends RobotBase {
         } else if (pathState == 2) {
             if (!follower.isBusy()) setPathState(3);
         } else if (pathState == 3) {
+            velocityOffset = 0;
             if (pathTimer.getElapsedTimeSeconds() >= 1.5) {
                 setShooting = false;
                 colorSpinner.slowMode();
@@ -183,7 +185,7 @@ public class RedP1 extends RobotBase {
         autonomousPathUpdate();
         //vision
         intake.on();
-        shooter.shootingPRO(0, setVelocity, setYawDegree, setPitchDegree, setShooting);
+        shooter.shootingPRO(0, setVelocity, 60, setPitchDegree, setShooting);
         // These loop the movements of the robot
 
         telemetry.addData("uVelocity", shooter.limelight.getLatestResult().getTx());

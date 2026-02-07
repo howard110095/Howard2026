@@ -16,6 +16,12 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constant.RobotBase;
 @TeleOp(name = "RPMTest", group = "Linear OpMode")
 public class RPMTest extends RobotBase {
     public static double targetVelocity = 3000;
+    public static double uP = 0;
+    public static double uI = 0;
+    public static double uD = 0;
+    public static double dP = 0;
+    public static double dI = 0;
+    public static double dD = 0;
 
     @Override
     public void robotInit() {
@@ -34,9 +40,7 @@ public class RPMTest extends RobotBase {
 
     @Override
     public void robotLoop() {
-        intake.on();
-        colorSpinner.on();
-        shooter.shootingPRO(0, targetVelocity, setYawDegree, setPitchDegree, true);
+        shooter.shooterPID(targetVelocity, uP, uI, uD, dP, dI, dD);
 
         // drive
         double axial = -gamepad1.left_stick_y;

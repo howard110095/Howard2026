@@ -21,40 +21,41 @@ public class BlueStrafePark extends RobotBase {
 
     public void buildPaths() {
         path0 = follower.pathBuilder()
-                .addPath(new BezierLine(B_P2_start, B_P2_shoot))
-                .setLinearHeadingInterpolation(B_P2_start.getHeading(), B_P2_shoot.getHeading())
+                .addPath(new BezierLine(B_P2_start, B_P2_stop))
+                .setLinearHeadingInterpolation(B_P2_start.getHeading(), B_P2_stop.getHeading())
                 .build();
 
-        park = follower.pathBuilder()
-                .addPath(new BezierLine(B_P2_shoot, B_P2_stop))
-                .setLinearHeadingInterpolation(B_P2_shoot.getHeading(), B_P2_stop.getHeading())
-                .build();
+//        park = follower.pathBuilder()
+//                .addPath(new BezierLine(B_P2_shoot, B_P2_stop))
+//                .setLinearHeadingInterpolation(B_P2_shoot.getHeading(), B_P2_stop.getHeading())
+//                .build();
     }
 
     public void autonomousPathUpdate() {
         if (pathState == 0) {
             follower.followPath(path0, true);
             setPathState(1);
-        } else if (pathState == 1) {
-            if (!follower.isBusy()) setPathState(2);
-        } else if (pathState == 2) {
-            setShooting = true;
-            colorSpinner.on();
-            if (pathTimer.getElapsedTimeSeconds() >= 1.5) {
-                setShooting = false;
-                colorSpinner.slowMode();
-                setPathState(3);
-            }
-        } else if (pathState == 3) {
-            if (!follower.isBusy()) {
-                follower.followPath(park, true);
-                setPathState(-1);
-            }
-        }else  if (!follower.isBusy()) {
-            follower.followPath(park, true);
-            setPathState(-1);
         }
-            colorSpinner.spin.setPower(0);
+//        else if (pathState == 1) {
+//            if (!follower.isBusy()) setPathState(2);
+//        } else if (pathState == 2) {
+//            setShooting = true;
+//            colorSpinner.on();
+//            if (pathTimer.getElapsedTimeSeconds() >= 1.5) {
+//                setShooting = false;
+//                colorSpinner.slowMode();
+//                setPathState(3);
+//            }
+//        } else if (pathState == 3) {
+//            if (!follower.isBusy()) {
+//                follower.followPath(park, true);
+//                setPathState(-1);
+//            }
+//        }else  if (!follower.isBusy()) {
+//            follower.followPath(park, true);
+//            setPathState(-1);
+//        }
+//            colorSpinner.spin.setPower(0);
 
     }
 
@@ -68,7 +69,7 @@ public class BlueStrafePark extends RobotBase {
         follower.update();
         autonomousPathUpdate();
         //vision
-        shooter.shootingPRO(2, setVelocity, setYawDegree, setPitchDegree, setShooting);
+//        shooter.shootingPRO(2, setVelocity, setYawDegree, setPitchDegree, setShooting);
         // These loop the movements of the robot
 
         telemetry.addData("uVelocity", shooter.limelight.getLatestResult().getTx());

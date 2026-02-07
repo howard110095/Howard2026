@@ -94,19 +94,20 @@ public class Shooter {
         return Math.pow(dx(pipe) * dx(pipe) + dy(pipe) * dy(pipe), 0.5);
     }
 
+    private void _shooterPIDSolver(DcMotorEx shooter, PIDController controller, double targetVelocity, double maxVelocity, double p, double i, double d) {
+        // set up
+        double targetPower = targetVelocity / maxVelocity;
+        double currentPower = ((shooter.getVelocity() / 28) * 60) / maxVelocity;
+        controller.setPID(p, i, d);
+        // calculate next power & apply
+        double fixPower = controller.calculate(currentPower, targetPower);
+        double newPower = clamp(targetPower + fixPower, -1f, 1f);
+        shooter.setPower(newPower);
+    }
+
     public void shooterPID(double targetVelocity, double uP, double uI, double uD, double dP, double dI, double dD) {
-        double velocity1 = targetVelocity / MaxUpVelocity;
-        double velocity2 = targetVelocity / MaxDownVelocity;
-        uVelocity = ((shooterU.getVelocity() / 28) * 60) / MaxUpVelocity;
-        dVelocity = ((shooterD.getVelocity() / 28) * 60) / MaxDownVelocity;
-        ShooterUPID.setPID(uP, uI, uD); // setting PID
-        shooterU_power = ShooterUPID.calculate(uVelocity, velocity1); // calculate output power
-        ShooterDPID.setPID(dP, dI, dD); // setting PID
-        shooterD_power = ShooterDPID.calculate(dVelocity, velocity2); // calculate output power
-        shooterU_power = clamp(shooterU_power + velocity1, -1, 1.0); // setting in correct range
-        shooterD_power = clamp(shooterD_power + velocity2, -1, 1.0);
-        shooterU.setPower(shooterU_power);
-        shooterD.setPower(shooterD_power);
+        _shooterPIDSolver(shooterU, ShooterUPID, targetVelocity, MaxUpVelocity, uP, uI, uD);
+        _shooterPIDSolver(shooterD, ShooterDPID, targetVelocity, MaxDownVelocity, dP, dI, dD);
     }
 
     public void shootingPRO(int pipeline, double targetVelocity, double turretTargetYaw, double turretTargetPitch, boolean openShooting) {
@@ -118,15 +119,16 @@ public class Shooter {
         toVelocity = targetVelocity;
         if (targetVelocity == 0) {  //tracking
             if (result != null && result.isValid())  //have apriltag, velocity
-                targetDistance = 20.0 + ((29.5 - 14) / Math.tan(Math.toRadians(19.41 + limelight.getLatestResult().getTy())));
+                targetDistance = 20.0 + (0.909894063 * (29.5 - 11.5) / Math.tan(Math.toRadians(0.084413 + 19.41 + limelight.getLatestResult().getTy())));
             else
                 targetDistance = distance(pipeline);
 
             if (targetDistance > 120)
-                toVelocity = 0.4228 * targetDistance * targetDistance - 102.92 * targetDistance + 10200;
+                toVelocity = 14.462 * targetDistance + 1953;
             else toVelocity = 11.144 * targetDistance + 2376.3;
 
         }
+        toVelocity += velocityOffset;
         double velocity1 = toVelocity / MaxUpVelocity;
         double velocity2 = toVelocity / MaxDownVelocity;
         uVelocity = ((shooterU.getVelocity() / 28) * 60) / MaxUpVelocity;
@@ -157,10 +159,8 @@ public class Shooter {
         // turret target pitch degree
         toPitchDegree = turretTargetPitch;
         if (turretTargetPitch == 0) {
-            if (targetDistance < 100) toPitchDegree = 0.3472 * targetDistance + 12.679;
-            else if (targetDistance < 130) toPitchDegree = 45;
-            else if (targetDistance >= 130) toPitchDegree = 47;
-//            toPitchDegree = 0.1602 * targetDistance + 20.7;
+            if (targetDistance < 120) toPitchDegree = 0.3472 * targetDistance + 12.679;
+            else toPitchDegree = 47.5;
         }
         pitchDegree(toPitchDegree);
 
@@ -188,8 +188,6 @@ public class Shooter {
             elevatorOff();
         }
 
-        shooterU.setPower(shooterU_power);
-        shooterD.setPower(shooterD_power);
     }
 
     public int tagNumber() {

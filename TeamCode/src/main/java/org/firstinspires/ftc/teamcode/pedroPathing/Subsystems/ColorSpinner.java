@@ -39,6 +39,9 @@ public class ColorSpinner {
         spin.setPower(1);
     }
 
+    public void shooting() {
+        spin.setPower(0.15);
+    }
     public void classify() {
         spin.setPower(0.2);
     }
